@@ -648,7 +648,7 @@ ELSE
  write.who.messages = 0
 END IF
 RETURN
- 
+
 '*********************
 write.say:
 '*********************
@@ -778,7 +778,7 @@ END
 
 '*********************
 punt.Em:
-'*********************        
+'*********************
 TIMER OFF
 OPEN filename$ FOR APPEND SHARED AS #1
  what$ = myclient$ + " was kicked out of the chat room..."
