@@ -2,7 +2,7 @@
 
 A LAN chat application for MS-DOS, written in QBasic (1999).
 
-![](/scrnshot.bmp?raw=true)
+![](/screenshot.bmp?raw=true)
 
 ## About
 
@@ -46,7 +46,7 @@ Or run without arguments to be prompted for the network path.
 Compile with QuickBASIC 4.5 or QB64:
 
 ```
-qb64 Graffiti.bas -o GRAFFITI.EXE
+qb64 graffiti.bas -o graffiti.exe
 ```
 
 ## History
