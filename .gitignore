@@ -1,0 +1,18 @@
+# Compiled binaries
+*.exe
+*.com
+
+# QBasic/QuickBASIC temporary files
+*.obj
+*.bak
+*.tmp
+
+# QB64 compiler artifacts
+internal/
+
+# Editor backup files
+*~
+*.swp
+
+# Runtime logs (chat.log is the live message file)
+chat.log

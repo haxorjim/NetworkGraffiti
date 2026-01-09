@@ -12,6 +12,9 @@ COLOR 8
 GOSUB flashit
 SLEEP 1
 LOOP
+'just in case loop dies
+CLS
+END
 
 '*********************
 Initial.Settings:
@@ -20,9 +23,48 @@ RANDOMIZE TIMER
 mycolor = INT(RND * 15) + 1                   'Random Program Color
 host.color = 7                                'NWG HOST color setup
 myrandom$ = STR$(INT(RND * 100000) + 1)       'Users Random Code
-normname$ = "\\pdc1\temp\graffiti\chat.log"   '[Normal]
-safefile$ = "z:\???"                          '[Anti-Hack]
-filename$ = normname$                         'Setup Inititial Log File
+
+IF COMMAND$ = "" THEN
+        CLS
+        COLOR 7
+        PRINT "Network Graffiti: MS-DOS Version"
+        PRINT
+        PRINT "A shared network directory is required to function as"
+        PRINT "a file server for communication between the chat clients."
+        PRINT
+        PRINT "Please enter the common network share you will be using now."
+        PRINT "An invalid path will cause this program to crash!"
+        PRINT
+        PRINT "Example: \\server\share"
+        PRINT
+        INPUT "[\\computer\directory]:", filename$
+ELSEIF COMMAND$ = "/?" THEN
+        COLOR 7
+        PRINT "Network Graffiti - Command Line"
+        PRINT
+        PRINT "The shared network directory can be given at the command line."
+        PRINT "Example: graffiti \\server\share"
+        PRINT
+        END
+ELSE
+        filename$ = COMMAND$
+END IF
+        filename$ = filename$ + "\chat.log"
+        normname$ = filename$
+
+        CLS
+        COLOR 7
+        PRINT "Anti-Hack Mode allows you to escape to a secret chat location."
+        PRINT
+        PRINT "Enter an alternate network path for Anti-Hack Mode,"
+        PRINT "or press ENTER to skip."
+        PRINT
+        PRINT "Example: \\server\secret"
+        PRINT
+        INPUT "[\\computer\directory]:", safefile$
+        IF safefile$ <> "" THEN
+                safefile$ = safefile$ + "\chat.log"
+        END IF
 RETURN
 
 '*********************
@@ -30,24 +72,11 @@ computer.name:
 '*********************
 CLS
 SHELL "net name"
-number = SCREEN(4, 1)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 2)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 3)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 4)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 5)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 6)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 7)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 8)
-mycomputer$ = mycomputer$ + CHR$(number)
-number = SCREEN(4, 9)
-mycomputer$ = mycomputer$ + CHR$(number)
+FOR scrnpos = 1 TO 10
+   number = SCREEN(4, scrnpos)
+   mycomputer$ = mycomputer$ + CHR$(number)
+NEXT scrnpos
+IF mycomputer$ = STRING$(10, " ") THEN mycomputer$ = "UNKNOWN"
 RETURN
 
 '*********************
@@ -117,7 +146,12 @@ KEY(19) ON
 KEY(20) ON
 KEY(21) ON
 KEY(22) ON
+
+IF online = 1 THEN
+ELSE
 KEY(23) ON
+END IF
+
 KEY(24) ON
 KEY(25) ON
 RETURN
@@ -198,27 +232,29 @@ help.screen:
 TIMER OFF
 GOSUB keys.off
 COLOR mycolor
-LOCATE 3, 6: PRINT "здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©"
+LOCATE 3, 6: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©"
 FOR h = 4 TO 22
- LOCATE h, 6: PRINT "Ё                                                                    Ё"
+ LOCATE h, 6: PRINT "О©╫                                                                    О©╫"
 NEXT h
-COLOR 7
+COLOR 15
 LOCATE 5, 10: PRINT "                 NETWORK GRAFFITI HELP SCREEN"
-LOCATE 7, 10: PRINT "CTRL + L           Logon to Network Graffiti"
-LOCATE 8, 10: PRINT "CTRL + N           Changes username if logged on"
-LOCATE 9, 10: PRINT "CTRL + A           Enter Anti-Punt Password"
-LOCATE 10, 10: PRINT "CTRL + P           Punts an unprotected user out of the chatroom"
-LOCATE 11, 10: PRINT "CTRL + C           Changes Network Graffiti user color"
-LOCATE 12, 10: PRINT "CTRL + J           Joins a channel"
+COLOR 7
+LOCATE 7, 10: PRINT "CTRL + L           Connect to Network Graffiti"
+LOCATE 8, 10: PRINT "CTRL + N           Change your Alias while Connected"
+LOCATE 9, 10: PRINT "CTRL + A           Enter the Anti-Punt Password [ANTI]"
+LOCATE 10, 10: PRINT "CTRL + P           Punts an Unprotected User out of NWG"
+LOCATE 11, 10: PRINT "CTRL + C           Changes Network Graffiti User Color"
+LOCATE 12, 10: PRINT "CTRL + J           Joins a Channel [Default: #MAIN]"
 LOCATE 13, 10: PRINT "CTRL + X           Exits Network Graffiti"
-LOCATE 14, 10: PRINT "CTRL + W           Lists connected users and details"
+LOCATE 14, 10: PRINT "CTRL + W           Lists Connected Users and Details"
 LOCATE 15, 10: PRINT "CTRL + H           Switches to [Anti-Hack Mode]"
 LOCATE 17, 10: PRINT "F1                 Displays this Help Screen"
-LOCATE 18, 10: PRINT "F2                 MS-DOS command prompt"
-LOCATE 19, 10: PRINT "F3                 Display the log file"
-LOCATE 21, 10: PRINT "Network Graffiti - Copyright (c) 1999 QB_god"
+LOCATE 18, 10: PRINT "F2                 MS-DOS Command Prompt"
+LOCATE 19, 10: PRINT "F3                 Display the Log File"
+COLOR 15
+LOCATE 21, 10: PRINT "        NWG - Copyright (C)1999-"; RIGHT$(DATE$, 4); " haxorjim"
 COLOR mycolor
-LOCATE 23, 6: PRINT "юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды"
+LOCATE 23, 6: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫"
 DO WHILE INKEY$ = ""
 LOOP
 GOSUB keys.on
@@ -265,11 +301,11 @@ logon.command:
 '*********************
 GOSUB keys.off
 COLOR mycolor
-LOCATE 10, 15: PRINT "здддддддддддддддддддддддддддддддддддддддддддддд©"
-LOCATE 11, 15: PRINT "Ё                             здддддддддддд©   Ё"
-LOCATE 12, 15: PRINT "Ё                             Ё            Ё   Ё"
-LOCATE 13, 15: PRINT "Ё                             юдддддддддддды   Ё"
-LOCATE 14, 15: PRINT "юдддддддддддддддддддддддддддддддддддддддддддддды"
+LOCATE 10, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©"
+LOCATE 11, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©   О©╫"
+LOCATE 12, 15: PRINT "О©╫                             О©╫            О©╫   О©╫"
+LOCATE 13, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫   О©╫"
+LOCATE 14, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫"
 COLOR 15
 LOCATE 12, 20: PRINT "Handle:"
 COLOR mycolor
@@ -292,6 +328,7 @@ IF myclient$ <> "" AND myclient$ <> " " THEN
  GOSUB join.channel
  GOTO message.loop
 ELSE
+ KEY(23) ON
  GOSUB draw.program
  GOSUB welcome.message
 END IF
@@ -304,11 +341,11 @@ IF online = 1 THEN
  GOSUB keys.off
  TIMER OFF
  COLOR mycolor
- LOCATE 10, 15: PRINT "здддддддддддддддддддддддддддддддддддддддддддддд©"
- LOCATE 11, 15: PRINT "Ё                             здддддддддддд©   Ё"
- LOCATE 12, 15: PRINT "Ё                             Ё            Ё   Ё"
- LOCATE 13, 15: PRINT "Ё                             юдддддддддддды   Ё"
- LOCATE 14, 15: PRINT "юдддддддддддддддддддддддддддддддддддддддддддддды"
+ LOCATE 10, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©"
+ LOCATE 11, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©   О©╫"
+ LOCATE 12, 15: PRINT "О©╫                             О©╫            О©╫   О©╫"
+ LOCATE 13, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫   О©╫"
+ LOCATE 14, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫"
  COLOR 15
  LOCATE 12, 20: PRINT "Handle:"
  COLOR mycolor
@@ -337,8 +374,22 @@ END IF
 RETURN
 
 '*********************
+shell.command:
+'*********************
+COLOR 7
+CLS
+SHELL
+GOSUB draw.program
+IF online <> 1 THEN GOSUB welcome.message
+RETURN
+
+'*********************
 hack.command:
 '*********************
+IF safefile$ = "" THEN
+ BEEP
+ RETURN
+END IF
 IF hack <> 1 THEN
  filename$ = safefile$
  OPEN filename$ FOR APPEND SHARED AS #1
@@ -354,17 +405,12 @@ IF hack <> 1 THEN
  hack = 1
  GOSUB draw.program
  IF online <> 1 THEN GOSUB welcome.message
+ELSE
+ filename$ = normname$
+ hack = 0
+ GOSUB draw.program
+ IF online <> 1 THEN GOSUB welcome.message
 END IF
-RETURN
-
-'*********************
-shell.command:
-'*********************
-COLOR 7
-CLS
-SHELL
-GOSUB draw.program
-IF online <> 1 THEN GOSUB welcome.message
 RETURN
 
 '*********************
@@ -392,11 +438,11 @@ GOSUB keys.off
 TIMER OFF
 mychannel.old$ = mychannel$
 COLOR mycolor
-LOCATE 10, 15: PRINT "здддддддддддддддддддддддддддддддддддддддддддддд©"
-LOCATE 11, 15: PRINT "Ё                             здддддддддддд©   Ё"
-LOCATE 12, 15: PRINT "Ё                             Ё            Ё   Ё"
-LOCATE 13, 15: PRINT "Ё                             юдддддддддддды   Ё"
-LOCATE 14, 15: PRINT "юдддддддддддддддддддддддддддддддддддддддддддддды"
+LOCATE 10, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©"
+LOCATE 11, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©   О©╫"
+LOCATE 12, 15: PRINT "О©╫                             О©╫            О©╫   О©╫"
+LOCATE 13, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫   О©╫"
+LOCATE 14, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫"
 COLOR 15
 LOCATE 12, 20: PRINT "Channel:"
 COLOR mycolor
@@ -440,11 +486,11 @@ GOSUB keys.off
 TIMER OFF
 mychannel.old$ = mychannel$
 COLOR mycolor
-LOCATE 10, 15: PRINT "здддддддддддддддддддддддддддддддддддддддддддддд©"
-LOCATE 11, 15: PRINT "Ё                             здддддддддддд©   Ё"
-LOCATE 12, 15: PRINT "Ё                             Ё            Ё   Ё"
-LOCATE 13, 15: PRINT "Ё                             юдддддддддддды   Ё"
-LOCATE 14, 15: PRINT "юдддддддддддддддддддддддддддддддддддддддддддддды"
+LOCATE 10, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©"
+LOCATE 11, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©   О©╫"
+LOCATE 12, 15: PRINT "О©╫                             О©╫            О©╫   О©╫"
+LOCATE 13, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫   О©╫"
+LOCATE 14, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫"
 COLOR 15
 LOCATE 12, 20: PRINT "Punt:"
 COLOR mycolor
@@ -476,11 +522,11 @@ IF online = 1 THEN
  TIMER OFF
  GOSUB keys.off
  COLOR mycolor
- LOCATE 10, 15: PRINT "здддддддддддддддддддддддддддддддддддддддддддддд©"
- LOCATE 11, 15: PRINT "Ё                             здддддддддддд©   Ё"
- LOCATE 12, 15: PRINT "Ё                             Ё            Ё   Ё"
- LOCATE 13, 15: PRINT "Ё                             юдддддддддддды   Ё"
- LOCATE 14, 15: PRINT "юдддддддддддддддддддддддддддддддддддддддддддддды"
+ LOCATE 10, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©"
+ LOCATE 11, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©   О©╫"
+ LOCATE 12, 15: PRINT "О©╫                             О©╫            О©╫   О©╫"
+ LOCATE 13, 15: PRINT "О©╫                             О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫   О©╫"
+ LOCATE 14, 15: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫"
  COLOR 15
  LOCATE 12, 20: PRINT "Password:"
  COLOR mycolor
@@ -536,7 +582,7 @@ current2$ = ""
 pass$ = ""
  COLOR mycolor
  GOSUB keys.on
- IF code$ = "9749766" THEN
+ IF UCASE$(code$) = "IDDQD" THEN
   super.access = 1
   mylevel$ = "INVINCIBLE"
   spunts$ = "off"
@@ -558,7 +604,7 @@ join.channel:
 '*********************
 TIMER ON
 ON TIMER(1) GOSUB time.loop
-mychannel$ = "main"
+mychannel$ = "MAIN"
 GOSUB channel.message
 OPEN filename$ FOR APPEND SHARED AS #1
  a$ = myclient$ + " just entered the chat room..."
@@ -647,7 +693,7 @@ write.who:
 IF who.n = 0 THEN
  OPEN filename$ FOR APPEND SHARED AS #1
   WRITE #1, "", myrandom$, 0, mychannel$, "who"
-  what$ = "Handle      Channel     Net Name    Punting     Line Rate"
+  what$ = "Handle      Channel     Computer    Punting     Line Rate"
   WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
   l$ = STRING$(10, 196)
   what$ = l$ + SPACE$(2) + l$ + SPACE$(2) + l$ + SPACE$(2) + l$ + SPACE$(2) + l$
@@ -903,21 +949,23 @@ RETURN
 draw.menu:
 '********************
 COLOR mycolor
-LOCATE 6, 24: PRINT "здддддддддддддддддддддддддддддд©"
-LOCATE 7, 24: PRINT "Ё                              Ё"
-LOCATE 8, 24: PRINT "Ё                              Ё"
-LOCATE 9, 24: PRINT "Ё                              Ё"
-LOCATE 10, 24: PRINT "Ё                              Ё"
-LOCATE 11, 24: PRINT "Ё                              Ё"
-LOCATE 12, 24: PRINT "Ё                              Ё"
-LOCATE 13, 24: PRINT "Ё                              Ё"
-LOCATE 14, 24: PRINT "Ё                              Ё"
-LOCATE 15, 24: PRINT "Ё                              Ё"
-LOCATE 16, 24: PRINT "Ё                              Ё"
-LOCATE 17, 24: PRINT "Ё                              Ё"
-LOCATE 18, 24: PRINT "юдддддддддддддддддддддддддддддды"
+LOCATE 6, 24: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д©"
+LOCATE 7, 24: PRINT "О©╫                              О©╫"
+LOCATE 8, 24: PRINT "О©╫                              О©╫"
+LOCATE 9, 24: PRINT "О©╫                              О©╫"
+LOCATE 10, 24: PRINT "О©╫                              О©╫"
+LOCATE 11, 24: PRINT "О©╫                              О©╫"
+LOCATE 12, 24: PRINT "О©╫                              О©╫"
+LOCATE 13, 24: PRINT "О©╫                              О©╫"
+LOCATE 14, 24: PRINT "О©╫                              О©╫"
+LOCATE 15, 24: PRINT "О©╫                              О©╫"
+LOCATE 16, 24: PRINT "О©╫                              О©╫"
+LOCATE 17, 24: PRINT "О©╫                              О©╫"
+LOCATE 18, 24: PRINT "О©╫                              О©╫"
+LOCATE 19, 24: PRINT "О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫"
 COLOR 15
 LOCATE 7, 29: PRINT "Network Graffiti Color"
+LOCATE 18, 26: PRINT "[TAB] Choose, [ENTER] Select"
 COLOR 7
 LOCATE 9, 27: PRINT "Dark Blue"
 LOCATE 10, 27: PRINT "Dark Green"
@@ -987,8 +1035,8 @@ RETURN
 '****************
 menu.lines:
 '****************
-IF menu.line < 9 THEN LOCATE menu.line - 1 + 9, 26: PRINT "Ч"
-IF menu.line > 8 THEN LOCATE menu.line, 40: PRINT "Ч"
+IF menu.line < 9 THEN LOCATE menu.line - 1 + 9, 26: PRINT "О©╫"
+IF menu.line > 8 THEN LOCATE menu.line, 40: PRINT "О©╫"
 IF menu.line = 1 THEN LOCATE 9, 27: PRINT "Dark Blue"
 IF menu.line = 2 THEN LOCATE 10, 27: PRINT "Dark Green"
 IF menu.line = 3 THEN LOCATE 11, 27: PRINT "Dark Cyan"
