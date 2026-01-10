@@ -13,8 +13,6 @@ DO
  ctrlDown = _KEYDOWN(100305) OR _KEYDOWN(100306)         ' Left or Right CTRL
  SELECT CASE k&
   CASE 15104: GOSUB help.screen                          ' F1
-  CASE 15360: GOSUB shell.command                        ' F2
-  CASE 15616: GOSUB type.command                         ' F3
   CASE 108, 76: IF ctrlDown THEN GOSUB logon.command     ' CTRL+L
   CASE 120, 88: IF ctrlDown THEN GOSUB exit.chat         ' CTRL+X
  END SELECT
@@ -84,13 +82,12 @@ RETURN
 '*********************
 computer.name:
 '*********************
-CLS
-SHELL "net name"
-FOR scrnpos = 1 TO 10
-   number = SCREEN(4, scrnpos)
-   mycomputer$ = mycomputer$ + CHR$(number)
-NEXT scrnpos
-IF mycomputer$ = STRING$(10, " ") THEN mycomputer$ = "UNKNOWN"
+SHELL _HIDE "hostname > _hostname.tmp"
+OPEN "_hostname.tmp" FOR INPUT AS #99
+LINE INPUT #99, mycomputer$
+CLOSE #99
+KILL "_hostname.tmp"
+IF mycomputer$ = "" THEN mycomputer$ = "UNKNOWN"
 RETURN
 
 '*********************
@@ -185,8 +182,6 @@ LOCATE 13, 10: PRINT "CTRL + X           Exits Network Graffiti"
 LOCATE 14, 10: PRINT "CTRL + W           Lists Connected Users and Details"
 LOCATE 15, 10: PRINT "CTRL + H           Switches to [Anti-Hack Mode]"
 LOCATE 17, 10: PRINT "F1                 Displays this Help Screen"
-LOCATE 18, 10: PRINT "F2                 MS-DOS Command Prompt"
-LOCATE 19, 10: PRINT "F3                 Display the Log File"
 COLOR 15
 LOCATE 21, 10: PRINT "        NWG - Copyright (C)1999-"; RIGHT$(DATE$, 4); " haxorjim"
 COLOR mycolor
@@ -303,16 +298,6 @@ END IF
 RETURN
 
 '*********************
-shell.command:
-'*********************
-COLOR 7
-CLS
-SHELL
-GOSUB draw.program
-IF online <> 1 THEN GOSUB welcome.message
-RETURN
-
-'*********************
 hack.command:
 '*********************
 IF safefile$ = "" THEN
@@ -340,20 +325,6 @@ ELSE
  GOSUB draw.program
  IF online <> 1 THEN GOSUB welcome.message
 END IF
-RETURN
-
-'*********************
-type.command:
-'*********************
-TIMER OFF
-COLOR 7
-CLS
-prmpt$ = "type " + filename$
-SHELL prmpt$
-DO: _LIMIT 60: k& = _KEYHIT: LOOP UNTIL k& > 0           ' Wait for new keypress
-GOSUB draw.program
-IF online <> 1 THEN GOSUB welcome.message
-TIMER ON
 RETURN
 
 '*********************
@@ -697,8 +668,6 @@ DO WHILE ender$ <> "true"                               ' if not end go
  ctrlDown = _KEYDOWN(100305) OR _KEYDOWN(100306)        ' Left or Right CTRL
  SELECT CASE k&
   CASE 15104: GOSUB help.screen: GOTO input.msg.resume   ' F1
-  CASE 15360: GOSUB shell.command: GOTO input.msg.resume ' F2
-  CASE 15616: GOSUB type.command: GOTO input.msg.resume  ' F3
   CASE 97, 65                                            ' A
    IF ctrlDown THEN GOSUB anti.command: GOTO input.msg.resume ELSE GOTO type.char
   CASE 110, 78                                           ' N
@@ -779,7 +748,7 @@ IF online = 1 THEN
 END IF
 COLOR 7
 CLS
-END
+SYSTEM
 
 '*********************
 punt.Em:
@@ -926,6 +895,16 @@ DO WHILE endloop$ <> "true"
  SELECT CASE k&
   CASE 13: endloop$ = "true"                              ' ENTER
   CASE 9: menu$ = "down": GOSUB menu2                     ' TAB
+  CASE 25: menu$ = "up": GOSUB menu2                      ' SHIFT+TAB
+  CASE 20480, 18432                                       ' DOWN, UP arrows
+   IF k& = 20480 THEN menu$ = "down" ELSE menu$ = "up"
+   GOSUB menu2
+  CASE 19712, 19200                                       ' RIGHT, LEFT arrows
+   IF k& = 19712 THEN
+    IF menu.line <= 7 THEN menu.line = menu.line + 8: GOSUB draw.menu: COLOR menu.line, 0: GOSUB menu.lines
+   ELSE
+    IF menu.line >= 9 THEN menu.line = menu.line - 8: GOSUB draw.menu: COLOR menu.line, 0: GOSUB menu.lines
+   END IF
  END SELECT
  _LIMIT 60
 LOOP

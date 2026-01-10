@@ -38,8 +38,6 @@ Or run without arguments to be prompted for the network path.
 | CTRL+H | Toggle Anti-Hack Mode |
 | CTRL+X | Exit |
 | F1 | Help screen |
-| F2 | DOS shell |
-| F3 | View chat log |
 
 ## Building
 
