@@ -30,7 +30,7 @@ Or run without arguments to be prompted for the network path.
 |-----|--------|
 | CTRL+L | Connect to chat |
 | CTRL+N | Change nickname |
-| CTRL+J | Join a channel |
+| CTRL+G | Join a channel |
 | CTRL+C | Change color |
 | CTRL+W | List connected users |
 | CTRL+P | Punt (kick) a user |
@@ -43,15 +43,20 @@ Or run without arguments to be prompted for the network path.
 
 ## Building
 
-### Prerequisites (macOS)
+Builds natively on macOS, Linux, and Windows using [QB64 Phoenix Edition](https://github.com/QB64-Phoenix-Edition/QB64pe).
+
+### Install Dependencies
 
 ```
-make install-xcode
+make install-deps
 ```
+
+This installs platform-specific build dependencies:
+- **macOS**: Xcode command line tools
+- **Linux**: OpenGL, ALSA, and C++ compiler (auto-detects apt/dnf/pacman)
+- **Windows**: None required (MinGW bundled with QB64-PE)
 
 ### Install QB64 Phoenix Edition
-
-[QB64 Phoenix Edition](https://github.com/QB64-Phoenix-Edition/QB64pe) is the actively maintained fork of QB64, a modern QuickBASIC compiler that runs on macOS, Windows, and Linux.
 
 ```
 make install-qb64pe
@@ -67,7 +72,7 @@ make build
 
 | Target | Description |
 |--------|-------------|
-| `make install-xcode` | Install Xcode command line tools |
+| `make install-deps` | Install platform-specific build dependencies |
 | `make install-qb64pe` | Clone and build QB64 Phoenix Edition |
-| `make build` | Compile graffiti.bas to graffiti.exe |
+| `make build` | Compile graffiti.bas to executable |
 | `make clean` | Remove built executable |
