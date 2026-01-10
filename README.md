@@ -1,6 +1,6 @@
 # Network Graffiti
 
-A LAN chat application originally written in QBasic for MS-DOS in 1999, now modernized to run on macOS, Linux, and Windows.
+A nostalgic LAN chat application for macOS, Linux, and Windows.
 
 ![](/screenshot.bmp?raw=true)
 
