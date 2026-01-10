@@ -1,12 +1,16 @@
 # Network Graffiti
 
-A LAN chat application for MS-DOS, written in QBasic (1999).
+A LAN chat application originally written in QBasic for MS-DOS in 1999, now modernized to run on macOS, Linux, and Windows.
 
 ![](/screenshot.bmp?raw=true)
 
 ## About
 
-Network Graffiti (NWG) enables real-time text chat between DOS machines on a local network. It uses a shared file on a network drive as a simple message broker—all clients read and write to the same `chat.log` file.
+Network Graffiti (NWG) enables real-time text chat over a local network using a shared file as a simple message broker—all clients read and write to the same `chat.log` file on a network drive.
+
+### History
+
+Written in 1999 for a college LAN running Windows NT 4.0 during an era when shared network drives were ubiquitous. The original version ran in MS-DOS and was compiled with Microsoft QuickBASIC 4.5. In 2026 the codebase was modernized to compile with [QB64 Phoenix Edition](https://github.com/QB64-Phoenix-Edition/QB64pe), bringing cross-platform support while preserving the retro text-mode aesthetic.
 
 Features:
 - Multiple chat channels
