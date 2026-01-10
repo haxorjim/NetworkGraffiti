@@ -10,7 +10,9 @@ Network Graffiti (NWG) enables real-time text chat over a local network using a 
 
 ### History
 
-Written in 1999 for a college LAN running Windows NT 4.0 during an era when shared network drives were ubiquitous. The original version ran in MS-DOS and was compiled with Microsoft QuickBASIC 4.5. In 2026 the codebase was modernized to compile with [QB64 Phoenix Edition](https://github.com/QB64-Phoenix-Edition/QB64pe), bringing cross-platform support while preserving the retro text-mode aesthetic.
+Network Graffiti was written in 1999 for a college LAN running Windows NT 4.0. It evolved from earlier experiments with NT's `net send` command, which could pop messages onto any computer on the network. Network Graffiti took a different approach—using a shared file as a message broker to enable multi-user chat rooms.
+
+The original version was compiled with Microsoft QuickBASIC 4.5 and ran in MS-DOS. In 2026 the codebase was modernized to compile with [QB64 Phoenix Edition](https://github.com/QB64-Phoenix-Edition/QB64pe), bringing cross-platform support while preserving the retro text-mode aesthetic.
 
 Features:
 - Multiple chat channels

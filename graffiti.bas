@@ -1,792 +1,793 @@
 '**********************
 '*  Network Graffiti  *
 '**********************
-CLS
-GOSUB Initial.Settings
-GOSUB computer.name
-GOSUB draw.program
-GOSUB welcome.message
+$Resize:Stretch
+Cls
+GoSub Initial.Settings
+GoSub computer.name
+GoSub draw.program
+GoSub welcome.message
 framecount = 0
 ctrlDown = 0
-DO
- k& = _KEYHIT
- ctrlDown = _KEYDOWN(100305) OR _KEYDOWN(100306)         ' Left or Right CTRL
- SELECT CASE k&
-  CASE 15104: GOSUB help.screen                          ' F1
-  CASE 108, 76: IF ctrlDown THEN GOSUB logon.command     ' CTRL+L
-  CASE 120, 88: IF ctrlDown THEN GOSUB exit.chat         ' CTRL+X
- END SELECT
- framecount = framecount + 1
- IF framecount >= 30 THEN                                ' Every ~0.5 sec at 60fps
-  COLOR 8
-  GOSUB flashit
-  framecount = 0
- END IF
- _LIMIT 60
-LOOP
+Do
+    k& = _KeyHit
+    ctrlDown = _KeyDown(100305) Or _KeyDown(100306) ' Left or Right CTRL
+    Select Case k&
+        Case 15104: GoSub help.screen ' F1
+        Case 108, 76: If ctrlDown Then GoSub logon.command ' CTRL+L
+        Case 120, 88: If ctrlDown Then GoSub exit.chat ' CTRL+X
+    End Select
+    framecount = framecount + 1
+    If framecount >= 30 Then ' Every ~0.5 sec at 60fps
+        Color 8
+        GoSub flashit
+        framecount = 0
+    End If
+    _Limit 60
+Loop
 'just in case loop dies
-CLS
-END
+Cls
+End
 
 '*********************
 Initial.Settings:
 '*********************
-RANDOMIZE TIMER
-mycolor = INT(RND * 15) + 1                   'Random Program Color
-host.color = 7                                'NWG HOST color setup
-myrandom$ = STR$(INT(RND * 100000) + 1)       'Users Random Code
+Randomize Timer
+mycolor = Int(Rnd * 15) + 1 'Random Program Color
+host.color = 7 'NWG HOST color setup
+myrandom$ = Str$(Int(Rnd * 100000) + 1) 'Users Random Code
 
 ' Parse command line arguments
 sharepath$ = ""
 username$ = ""
 showhelp = 0
 
-IF _COMMANDCOUNT = 0 THEN
- showhelp = 1
-ELSE
- i = 1
- WHILE i <= _COMMANDCOUNT
-  arg$ = COMMAND$(i)
-  SELECT CASE arg$
-   CASE "--help", "-h"
+If _CommandCount = 0 Then
     showhelp = 1
-   CASE "--share"
-    IF i + 1 <= _COMMANDCOUNT THEN
-     i = i + 1
-     sharepath$ = COMMAND$(i)
-    END IF
-   CASE "--user"
-    IF i + 1 <= _COMMANDCOUNT THEN
-     i = i + 1
-     username$ = COMMAND$(i)
-    END IF
-  END SELECT
-  i = i + 1
- WEND
-END IF
+Else
+    i = 1
+    While i <= _CommandCount
+        arg$ = Command$(i)
+        Select Case arg$
+            Case "--help", "-h"
+                showhelp = 1
+            Case "--share"
+                If i + 1 <= _CommandCount Then
+                    i = i + 1
+                    sharepath$ = Command$(i)
+                End If
+            Case "--user"
+                If i + 1 <= _CommandCount Then
+                    i = i + 1
+                    username$ = Command$(i)
+                End If
+        End Select
+        i = i + 1
+    Wend
+End If
 
 ' Show help if requested or missing required args
-IF showhelp = 1 OR sharepath$ = "" THEN
- COLOR 7
- PRINT "Network Graffiti"
- PRINT
- PRINT "Usage: graffiti --share <path> [options]"
- PRINT
- PRINT "Required:"
- PRINT "  --share <path>    Path to shared network directory"
- PRINT
- PRINT "Options:"
- PRINT "  --user <name>     Set chat nickname (skips login prompt)"
- PRINT "  --help, -h        Show this help message"
- PRINT
- PRINT "Example:"
- PRINT "  graffiti --share /mnt/network/chat"
- PRINT "  graffiti --share \\server\share"
- PRINT
- END
-END IF
+If showhelp = 1 Or sharepath$ = "" Then
+    Color 7
+    Print "Network Graffiti"
+    Print
+    Print "Usage: graffiti --share <path> [options]"
+    Print
+    Print "Required:"
+    Print "  --share <path>    Path to shared network directory"
+    Print
+    Print "Options:"
+    Print "  --user <name>     Set chat nickname (skips login prompt)"
+    Print "  --help, -h        Show this help message"
+    Print
+    Print "Example:"
+    Print "  graffiti --share /mnt/network/chat"
+    Print "  graffiti --share \\server\share"
+    Print
+    End
+End If
 
 ' Detect path separator from share path
-IF INSTR(sharepath$, "\") > 0 THEN
- pathsep$ = "\"
-ELSE
- pathsep$ = "/"
-END IF
+If InStr(sharepath$, "\") > 0 Then
+    pathsep$ = "\"
+Else
+    pathsep$ = "/"
+End If
 filename$ = sharepath$ + pathsep$ + "chat.log"
 normname$ = filename$
 safefile$ = ""
-RETURN
+Return
 
 '*********************
 computer.name:
 '*********************
-SHELL _HIDE "hostname > _hostname.tmp"
-OPEN "_hostname.tmp" FOR INPUT AS #99
-LINE INPUT #99, mycomputer$
-CLOSE #99
-KILL "_hostname.tmp"
-IF mycomputer$ = "" THEN mycomputer$ = "UNKNOWN"
-RETURN
+Shell _Hide "hostname > _hostname.tmp"
+Open "_hostname.tmp" For Input As #99
+Line Input #99, mycomputer$
+Close #99
+Kill "_hostname.tmp"
+If mycomputer$ = "" Then mycomputer$ = "UNKNOWN"
+Return
 
 '*********************
 welcome.message:
 '*********************
-COLOR host.color
+Color host.color
 s$ = "\         \ \                                                            \"
 what$ = "        ____,wggggMMMM0MM@@@@@@@MMMMMM0Mgggyy,____"
-LOCATE 6, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 6, 4: Print Using s$; "NWG HOST"; what$
 what$ = "   __wmM#$$g#@MM@''`                    `''MMMMMMMMMMgy__"
-LOCATE 7, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 7, 4: Print Using s$; "NWG HOST"; what$
 what$ = "  y0@OwDMMMMMMM                               ^QMMMMMMMMMM0g"
-LOCATE 8, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 8, 4: Print Using s$; "NWG HOST"; what$
 what$ = "   #@g2$0MMMMMf                                 jMNEMMMMMMMM0"
-LOCATE 9, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 9, 4: Print Using s$; "NWG HOST"; what$
 what$ = "    '90#MMMMMMMg                             _jMM#0MMMMMMMM'"
-LOCATE 10, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 10, 4: Print Using s$; "NWG HOST"; what$
 what$ = "      `''9MMMMMm                    __,yM$ZW0MM@M''`"
-LOCATE 11, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 11, 4: Print Using s$; "NWG HOST"; what$
 what$ = "          ```^~        __ygMMMMMMMMMMMMMM'^^`              "
-LOCATE 12, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 12, 4: Print Using s$; "NWG HOST"; what$
 what$ = "                    jgQ#j&MMMMMM0Am,"
-LOCATE 13, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 13, 4: Print Using s$; "NWG HOST"; what$
 what$ = "                         ``````     "
-LOCATE 14, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 14, 4: Print Using s$; "NWG HOST"; what$
 what$ = "                       _,wawyywy_   "
-LOCATE 15, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 15, 4: Print Using s$; "NWG HOST"; what$
 what$ = "                       9NMMMMMM@M`"
-LOCATE 16, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 16, 4: Print Using s$; "NWG HOST"; what$
 what$ = "                        9NM2$M@M"
-LOCATE 17, 4: PRINT USING s$; "NWG HOST"; what$
+Locate 17, 4: Print Using s$; "NWG HOST"; what$
 what$ = "                          ~'~~~'"
-LOCATE 18, 4: PRINT USING s$; "NWG HOST"; what$
-COLOR mycolor
-RETURN
+Locate 18, 4: Print Using s$; "NWG HOST"; what$
+Color mycolor
+Return
 
 '*********************
 draw.program:
 '*********************
-CLS
-COLOR 7
-COLOR 15
-LOCATE 2, 3: PRINT "      __ ___        __  ____          __  ____  __  ___ ___   ___  "
-LOCATE 3, 3: PRINT "#\ # #__  #  # # # #  # #__/ #_/     # __ #__/ #__# #_  #_  #  #  #"
-LOCATE 4, 3: PRINT "# \# #__  #  #_#_# #__# #  \ # \     #__# #  \ #  # #   #   #  #  #"
-COLOR mycolor
-LOCATE 5, 2: PRINT CHR$(218); STRING$(76, 196); CHR$(191)
-FOR y = 6 TO 18
-LOCATE y, 2: PRINT CHR$(179); SPC(76); CHR$(179)
-NEXT y
-LOCATE 19, 2: PRINT CHR$(192); STRING$(76, 196); CHR$(217)
-LOCATE 20, 2: PRINT CHR$(218); STRING$(62, 196); CHR$(191)
-LOCATE 21, 2: PRINT CHR$(179)
-COLOR 8
-LOCATE 21, 3: PRINT STRING$(62, 250)
-COLOR mycolor
-LOCATE 21, 65: PRINT CHR$(179)
-LOCATE 22, 2: PRINT CHR$(192); STRING$(62, 196); CHR$(217)
-LOCATE 20, 66: PRINT CHR$(218); STRING$(12, 196); CHR$(191)
-LOCATE 21, 66: PRINT CHR$(179); SPACE$(12); CHR$(179)
-LOCATE 22, 66: PRINT CHR$(192); STRING$(12, 196); CHR$(217)
-COLOR 7
-IF hack = 0 THEN
- LOCATE 23, 30: PRINT "[Normal Mode]"
-ELSE
- LOCATE 23, 30: PRINT "[Anti-Hack Mode]"
-END IF
-IF online <> 1 THEN LOCATE 23, 3: PRINT "NOT CONNECTED"
-LOCATE 23, 48: PRINT "[ F1: Help ] [ CTRL + X: Exit ]"
-COLOR mycolor
-RETURN
+Cls
+Color 7
+Color 15
+Locate 2, 3: Print "      __ ___        __  ____          __  ____  __  ___ ___   ___  "
+Locate 3, 3: Print "#\ # #__  #  # # # #  # #__/ #_/     # __ #__/ #__# #_  #_  #  #  #"
+Locate 4, 3: Print "# \# #__  #  #_#_# #__# #  \ # \     #__# #  \ #  # #   #   #  #  #"
+Color mycolor
+Locate 5, 2: Print Chr$(218); String$(76, 196); Chr$(191)
+For y = 6 To 18
+    Locate y, 2: Print Chr$(179); Spc(76); Chr$(179)
+Next y
+Locate 19, 2: Print Chr$(192); String$(76, 196); Chr$(217)
+Locate 20, 2: Print Chr$(218); String$(62, 196); Chr$(191)
+Locate 21, 2: Print Chr$(179)
+Color 8
+Locate 21, 3: Print String$(62, 250)
+Color mycolor
+Locate 21, 65: Print Chr$(179)
+Locate 22, 2: Print Chr$(192); String$(62, 196); Chr$(217)
+Locate 20, 66: Print Chr$(218); String$(12, 196); Chr$(191)
+Locate 21, 66: Print Chr$(179); Space$(12); Chr$(179)
+Locate 22, 66: Print Chr$(192); String$(12, 196); Chr$(217)
+Color 7
+If hack = 0 Then
+    Locate 23, 30: Print "[Normal Mode]"
+Else
+    Locate 23, 30: Print "[Anti-Hack Mode]"
+End If
+If online <> 1 Then Locate 23, 3: Print "NOT CONNECTED"
+Locate 23, 48: Print "[ F1: Help ] [ CTRL + X: Exit ]"
+Color mycolor
+Return
 
 '*********************
 help.screen:
 '*********************
-TIMER OFF
-COLOR mycolor
-LOCATE 3, 6: PRINT CHR$(218); STRING$(68, 196); CHR$(191)
-FOR h = 4 TO 22
- LOCATE h, 6: PRINT CHR$(179); SPACE$(68); CHR$(179)
-NEXT h
-COLOR 15
-LOCATE 5, 10: PRINT "                 NETWORK GRAFFITI HELP SCREEN"
-COLOR 7
-LOCATE 7, 10: PRINT "CTRL + L           Connect to Network Graffiti"
-LOCATE 8, 10: PRINT "CTRL + N           Change your Alias while Connected"
-LOCATE 9, 10: PRINT "CTRL + A           Enter the Anti-Punt Password [ANTI]"
-LOCATE 10, 10: PRINT "CTRL + P           Punts an Unprotected User out of NWG"
-LOCATE 11, 10: PRINT "CTRL + C           Changes Network Graffiti User Color"
-LOCATE 12, 10: PRINT "CTRL + G           Joins a Channel [Default: #MAIN]"
-LOCATE 13, 10: PRINT "CTRL + X           Exits Network Graffiti"
-LOCATE 14, 10: PRINT "CTRL + W           Lists Connected Users and Details"
-LOCATE 15, 10: PRINT "CTRL + H           Switches to [Anti-Hack Mode]"
-LOCATE 17, 10: PRINT "F1                 Displays this Help Screen"
-COLOR 15
-LOCATE 21, 10: PRINT "        NWG - Copyright (C)1999-"; RIGHT$(DATE$, 4); " haxorjim"
-COLOR mycolor
-LOCATE 23, 6: PRINT CHR$(192); STRING$(68, 196); CHR$(217)
-DO: _LIMIT 60: k& = _KEYHIT: LOOP UNTIL k& > 0           ' Wait for new keypress (ignore releases)
-TIMER ON
-GOSUB draw.program
-IF online <> 1 THEN GOSUB welcome.message
-RETURN
+Timer Off
+Color mycolor
+Locate 3, 6: Print Chr$(218); String$(68, 196); Chr$(191)
+For h = 4 To 22
+    Locate h, 6: Print Chr$(179); Space$(68); Chr$(179)
+Next h
+Color 15
+Locate 5, 10: Print "                 NETWORK GRAFFITI HELP SCREEN"
+Color 7
+Locate 7, 10: Print "CTRL + L           Connect to Network Graffiti"
+Locate 8, 10: Print "CTRL + N           Change your Alias while Connected"
+Locate 9, 10: Print "CTRL + A           Enter the Anti-Punt Password [ANTI]"
+Locate 10, 10: Print "CTRL + P           Punts an Unprotected User out of NWG"
+Locate 11, 10: Print "CTRL + C           Changes Network Graffiti User Color"
+Locate 12, 10: Print "CTRL + G           Joins a Channel [Default: #MAIN]"
+Locate 13, 10: Print "CTRL + X           Exits Network Graffiti"
+Locate 14, 10: Print "CTRL + W           Lists Connected Users and Details"
+Locate 15, 10: Print "CTRL + H           Switches to [Anti-Hack Mode]"
+Locate 17, 10: Print "F1                 Displays this Help Screen"
+Color 15
+Locate 21, 10: Print "        NWG - Copyright (C)1999-"; Right$(Date$, 4); " haxorjim"
+Color mycolor
+Locate 23, 6: Print Chr$(192); String$(68, 196); Chr$(217)
+Do: _Limit 60: k& = _KeyHit: Loop Until k& > 0 ' Wait for new keypress (ignore releases)
+Timer On
+GoSub draw.program
+If online <> 1 Then GoSub welcome.message
+Return
 
 '*********************
 channel.message:
 '*********************
-OPEN filename$ FOR APPEND SHARED AS #1
- what$ = ""
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = ""
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "      ^\/^"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "      (Oo)"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "       ()                  Welcome to the "
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "    oOO__OOo          Network Graffiti Chat Room!"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "     \/\/\/"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "      \/\/            Channel: #" + mychannel$
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "       ~~"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "       ||"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = "<>=-=-/__\=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=<>"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = ""
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- what$ = ""
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
-CLOSE #1
-RETURN
+Open filename$ For Append Shared As #1
+what$ = ""
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = ""
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "      ^\/^"
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "      (Oo)"
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "       ()                  Welcome to the "
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "    oOO__OOo          Network Graffiti Chat Room!"
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "     \/\/\/"
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "      \/\/            Channel: #" + mychannel$
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "       ~~"
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "       ||"
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = "<>=-=-/__\=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=<>"
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = ""
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+what$ = ""
+Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+Close #1
+Return
 
 '*********************
 logon.command:
 '*********************
 ' Use --user if provided, otherwise prompt
-IF username$ <> "" THEN
- myclient$ = username$
-ELSE
- COLOR mycolor
- LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
- LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
- LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
- LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
- LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
- COLOR 15
- LOCATE 12, 20: PRINT "Handle:"
- COLOR mycolor
- LOCATE 12, 29: PRINT "[ " + SPACE$(10) + " ]"
- COLOR 8
- LOCATE 12, 31: PRINT STRING$(10, 250)
- COLOR mycolor
- fy = 12: fx = 47
- py = 12: px = 31
- by = 12: bx = 29
- GOSUB input.prompts
- myclient$ = current2$
- ender2$ = ""
- test2$ = ""
- current2$ = ""
-END IF
-IF myclient$ <> "" AND myclient$ <> " " THEN
- online = 1
- mylevel$ = "VULNERABLE"
- GOSUB join.channel
- GOTO message.loop
-ELSE
- GOSUB draw.program
- GOSUB welcome.message
-END IF
-RETURN
+If username$ <> "" Then
+    myclient$ = username$
+Else
+    Color mycolor
+    Locate 10, 15: Print Chr$(218); String$(44, 196); Chr$(191)
+    Locate 11, 15: Print Chr$(179); Space$(29); Chr$(218); String$(12, 196); Chr$(191); Space$(1); Chr$(179)
+    Locate 12, 15: Print Chr$(179); Space$(29); Chr$(179); Space$(12); Chr$(179); Space$(1); Chr$(179)
+    Locate 13, 15: Print Chr$(179); Space$(29); Chr$(192); String$(12, 196); Chr$(217); Space$(1); Chr$(179)
+    Locate 14, 15: Print Chr$(192); String$(44, 196); Chr$(217)
+    Color 15
+    Locate 12, 20: Print "Handle:"
+    Color mycolor
+    Locate 12, 29: Print "[ " + Space$(10) + " ]"
+    Color 8
+    Locate 12, 31: Print String$(10, 250)
+    Color mycolor
+    fy = 12: fx = 47
+    py = 12: px = 31
+    by = 12: bx = 29
+    GoSub input.prompts
+    myclient$ = current2$
+    ender2$ = ""
+    test2$ = ""
+    current2$ = ""
+End If
+If myclient$ <> "" And myclient$ <> " " Then
+    online = 1
+    mylevel$ = "VULNERABLE"
+    GoSub join.channel
+    GoTo message.loop
+Else
+    GoSub draw.program
+    GoSub welcome.message
+End If
+Return
 
 '*********************
 rename.command:
 '*********************
-IF online = 1 THEN
- TIMER OFF
- COLOR mycolor
- LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
- LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
- LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
- LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
- LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
- COLOR 15
- LOCATE 12, 20: PRINT "Handle:"
- COLOR mycolor
- LOCATE 12, 29: PRINT "[ " + SPACE$(10) + " ]"
- COLOR 8
- LOCATE 12, 31: PRINT STRING$(10, 250)
- COLOR mycolor
- fy = 12: fx = 47
- py = 12: px = 31
- by = 12: bx = 29
- GOSUB input.prompts
- myclient2$ = current2$
- ender2$ = ""
- test2$ = ""
- current2$ = ""
- TIMER ON
- IF myclient2$ <> "" AND myclient2$ <> " " THEN
-  myclient.old$ = myclient$
-  write.rename.message = 1
-  myclient$ = myclient2$
- ELSE
-  GOSUB draw.program
- END IF
-END IF
-RETURN
+If online = 1 Then
+    Timer Off
+    Color mycolor
+    Locate 10, 15: Print Chr$(218); String$(44, 196); Chr$(191)
+    Locate 11, 15: Print Chr$(179); Space$(29); Chr$(218); String$(12, 196); Chr$(191); Space$(1); Chr$(179)
+    Locate 12, 15: Print Chr$(179); Space$(29); Chr$(179); Space$(12); Chr$(179); Space$(1); Chr$(179)
+    Locate 13, 15: Print Chr$(179); Space$(29); Chr$(192); String$(12, 196); Chr$(217); Space$(1); Chr$(179)
+    Locate 14, 15: Print Chr$(192); String$(44, 196); Chr$(217)
+    Color 15
+    Locate 12, 20: Print "Handle:"
+    Color mycolor
+    Locate 12, 29: Print "[ " + Space$(10) + " ]"
+    Color 8
+    Locate 12, 31: Print String$(10, 250)
+    Color mycolor
+    fy = 12: fx = 47
+    py = 12: px = 31
+    by = 12: bx = 29
+    GoSub input.prompts
+    myclient2$ = current2$
+    ender2$ = ""
+    test2$ = ""
+    current2$ = ""
+    Timer On
+    If myclient2$ <> "" And myclient2$ <> " " Then
+        myclient.old$ = myclient$
+        write.rename.message = 1
+        myclient$ = myclient2$
+    Else
+        GoSub draw.program
+    End If
+End If
+Return
 
 '*********************
 hack.command:
 '*********************
-IF safefile$ = "" THEN
- BEEP
- RETURN
-END IF
-IF hack <> 1 THEN
- filename$ = safefile$
- OPEN filename$ FOR APPEND SHARED AS #1
- FOR I = 1 TO 6
- WRITE #1, "", "NWG HOST", host.color, mychannel$, myrandom$
- NEXT I
- what$ = "             [Anti-Hack Mode] has been enabled"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- FOR I = 1 TO 6
- WRITE #1, "", "NWG HOST", host.color, mychannel$, myrandom$
- NEXT I
- CLOSE #1
- hack = 1
- GOSUB draw.program
- IF online <> 1 THEN GOSUB welcome.message
-ELSE
- filename$ = normname$
- hack = 0
- GOSUB draw.program
- IF online <> 1 THEN GOSUB welcome.message
-END IF
-RETURN
+If safefile$ = "" Then
+    Beep
+    Return
+End If
+If hack <> 1 Then
+    filename$ = safefile$
+    Open filename$ For Append Shared As #1
+    For i = 1 To 6
+        Write #1, "", "NWG HOST", host.color, mychannel$, myrandom$
+    Next i
+    what$ = "             [Anti-Hack Mode] has been enabled"
+    Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+    For i = 1 To 6
+        Write #1, "", "NWG HOST", host.color, mychannel$, myrandom$
+    Next i
+    Close #1
+    hack = 1
+    GoSub draw.program
+    If online <> 1 Then GoSub welcome.message
+Else
+    filename$ = normname$
+    hack = 0
+    GoSub draw.program
+    If online <> 1 Then GoSub welcome.message
+End If
+Return
 
 '*********************
 join.command:
 '*********************
-IF online = 1 THEN
-TIMER OFF
-mychannel.old$ = mychannel$
-COLOR mycolor
-LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
-LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
-LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
-LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
-LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
-COLOR 15
-LOCATE 12, 20: PRINT "Channel:"
-COLOR mycolor
-LOCATE 12, 30: PRINT "[ " + SPACE$(10) + " ]"
-COLOR 8
-LOCATE 12, 32: PRINT STRING$(10, 250)
-COLOR mycolor
-fy = 12: fx = 47
-py = 12: px = 32
-by = 12: bx = 30
-GOSUB input.prompts
-mychannel$ = current2$
-ender2$ = ""
-test2$ = ""
-current2$ = ""
-TIMER ON
-IF mychannel$ <> "" THEN
- write.join.message = 1
-ELSE
- mychannel$ = mychannel.old$
-END IF
-END IF
-RETURN
+If online = 1 Then
+    Timer Off
+    mychannel.old$ = mychannel$
+    Color mycolor
+    Locate 10, 15: Print Chr$(218); String$(44, 196); Chr$(191)
+    Locate 11, 15: Print Chr$(179); Space$(29); Chr$(218); String$(12, 196); Chr$(191); Space$(1); Chr$(179)
+    Locate 12, 15: Print Chr$(179); Space$(29); Chr$(179); Space$(12); Chr$(179); Space$(1); Chr$(179)
+    Locate 13, 15: Print Chr$(179); Space$(29); Chr$(192); String$(12, 196); Chr$(217); Space$(1); Chr$(179)
+    Locate 14, 15: Print Chr$(192); String$(44, 196); Chr$(217)
+    Color 15
+    Locate 12, 20: Print "Channel:"
+    Color mycolor
+    Locate 12, 30: Print "[ " + Space$(10) + " ]"
+    Color 8
+    Locate 12, 32: Print String$(10, 250)
+    Color mycolor
+    fy = 12: fx = 47
+    py = 12: px = 32
+    by = 12: bx = 30
+    GoSub input.prompts
+    mychannel$ = current2$
+    ender2$ = ""
+    test2$ = ""
+    current2$ = ""
+    Timer On
+    If mychannel$ <> "" Then
+        write.join.message = 1
+    Else
+        mychannel$ = mychannel.old$
+    End If
+End If
+Return
 
 '*********************
 who.command:
 '*********************
-IF online = 1 THEN
- write.who.messages = 1
-END IF
-RETURN
+If online = 1 Then
+    write.who.messages = 1
+End If
+Return
 
 '*********************
 punt.command:
 '*********************
-IF online = 1 THEN
-TIMER OFF
-mychannel.old$ = mychannel$
-COLOR mycolor
-LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
-LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
-LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
-LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
-LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
-COLOR 15
-LOCATE 12, 20: PRINT "Punt:"
-COLOR mycolor
-LOCATE 12, 30: PRINT "[ " + SPACE$(10) + " ]"
-COLOR 8
-LOCATE 12, 32: PRINT STRING$(10, 250)
-COLOR mycolor
-fy = 12: fx = 47
-py = 12: px = 32
-by = 12: bx = 30
-GOSUB input.prompts
-them$ = current2$
-ender2$ = ""
-test2$ = ""
-current2$ = ""
-TIMER ON
-IF them$ <> "" THEN
- write.punt.message = 1
-END IF
-END IF
-RETURN
+If online = 1 Then
+    Timer Off
+    mychannel.old$ = mychannel$
+    Color mycolor
+    Locate 10, 15: Print Chr$(218); String$(44, 196); Chr$(191)
+    Locate 11, 15: Print Chr$(179); Space$(29); Chr$(218); String$(12, 196); Chr$(191); Space$(1); Chr$(179)
+    Locate 12, 15: Print Chr$(179); Space$(29); Chr$(179); Space$(12); Chr$(179); Space$(1); Chr$(179)
+    Locate 13, 15: Print Chr$(179); Space$(29); Chr$(192); String$(12, 196); Chr$(217); Space$(1); Chr$(179)
+    Locate 14, 15: Print Chr$(192); String$(44, 196); Chr$(217)
+    Color 15
+    Locate 12, 20: Print "Punt:"
+    Color mycolor
+    Locate 12, 30: Print "[ " + Space$(10) + " ]"
+    Color 8
+    Locate 12, 32: Print String$(10, 250)
+    Color mycolor
+    fy = 12: fx = 47
+    py = 12: px = 32
+    by = 12: bx = 30
+    GoSub input.prompts
+    them$ = current2$
+    ender2$ = ""
+    test2$ = ""
+    current2$ = ""
+    Timer On
+    If them$ <> "" Then
+        write.punt.message = 1
+    End If
+End If
+Return
 
 '*********************
 anti.command:
 '*********************
-IF online = 1 THEN
- TIMER OFF
- COLOR mycolor
- LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
- LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
- LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
- LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
- LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
- COLOR 15
- LOCATE 12, 20: PRINT "Password:"
- COLOR mycolor
- LOCATE 12, 30: PRINT "[ " + SPACE$(10) + " ]"
- COLOR 8
- LOCATE 12, 32: PRINT STRING$(10, 250)
- COLOR mycolor
- DO WHILE ender2$ <> "true"
-  k& = _KEYHIT
-  SELECT CASE k&
-   CASE 13                                                ' ENTER
-    ender2$ = "true"
-   CASE 8                                                 ' BACKSPACE
-    length = LEN(current2$)
-    IF length > 0 THEN length = length - 1
-    current2$ = LEFT$(current2$, length)
-    pass$ = LEFT$(pass$, length)
-    COLOR mycolor
-    LOCATE 12, 30: PRINT "[ " + SPACE$(10) + " ]"
-    COLOR 8
-    LOCATE 12, 32: PRINT STRING$(10, 250)
-    COLOR mycolor
-    LOCATE 12, 32: PRINT pass$
-   CASE 32 TO 126                                         ' Printable ASCII
-    IF LEN(current2$) = 10 THEN
-     BEEP
-    ELSE
-     current2$ = current2$ + CHR$(k&)
-     pass$ = pass$ + "*"
-     LOCATE 12, 32: PRINT pass$
-    END IF
-   CASE 0                                                 ' No key pressed
-    p1 = p1 + 2
-    IF p1 >= 10 THEN
-     p1 = 0
-     cool1$ = CHR$(177)
-     LOCATE 12, 47: PRINT SPACE$(10)
-    ELSE
-     cool1$ = cool1$ + CHR$(177) + CHR$(177)
-    END IF
-    COLOR 8
-    LOCATE 12, 47: PRINT cool1$
-    COLOR mycolor
-    _LIMIT 60
-  END SELECT
- LOOP
-code$ = current2$
-ender2$ = ""
-test2$ = ""
-current2$ = ""
-pass$ = ""
- COLOR mycolor
- IF UCASE$(code$) = "IDDQD" THEN
-  super.access = 1
-  mylevel$ = "INVINCIBLE"
-  spunts$ = "off"
-  punts$ = "off"
-  DO WHILE VAL(num$) < 10
-  num$ = RIGHT$(STR$(INT(RND * 19) + 1), 2)
-  LOOP
-  mycomputer$ = "ET2898-" + num$
- ELSEIF UCASE$(code$) = "ANTI" THEN
-  mylevel$ = "PROTECTED"
-  punts$ = "off"
- END IF
- TIMER ON
-END IF
-RETURN
+If online = 1 Then
+    Timer Off
+    Color mycolor
+    Locate 10, 15: Print Chr$(218); String$(44, 196); Chr$(191)
+    Locate 11, 15: Print Chr$(179); Space$(29); Chr$(218); String$(12, 196); Chr$(191); Space$(1); Chr$(179)
+    Locate 12, 15: Print Chr$(179); Space$(29); Chr$(179); Space$(12); Chr$(179); Space$(1); Chr$(179)
+    Locate 13, 15: Print Chr$(179); Space$(29); Chr$(192); String$(12, 196); Chr$(217); Space$(1); Chr$(179)
+    Locate 14, 15: Print Chr$(192); String$(44, 196); Chr$(217)
+    Color 15
+    Locate 12, 20: Print "Password:"
+    Color mycolor
+    Locate 12, 30: Print "[ " + Space$(10) + " ]"
+    Color 8
+    Locate 12, 32: Print String$(10, 250)
+    Color mycolor
+    Do While ender2$ <> "true"
+        k& = _KeyHit
+        Select Case k&
+            Case 13 ' ENTER
+                ender2$ = "true"
+            Case 8 ' BACKSPACE
+                length = Len(current2$)
+                If length > 0 Then length = length - 1
+                current2$ = Left$(current2$, length)
+                pass$ = Left$(pass$, length)
+                Color mycolor
+                Locate 12, 30: Print "[ " + Space$(10) + " ]"
+                Color 8
+                Locate 12, 32: Print String$(10, 250)
+                Color mycolor
+                Locate 12, 32: Print pass$
+            Case 32 To 126 ' Printable ASCII
+                If Len(current2$) = 10 Then
+                    Beep
+                Else
+                    current2$ = current2$ + Chr$(k&)
+                    pass$ = pass$ + "*"
+                    Locate 12, 32: Print pass$
+                End If
+            Case 0 ' No key pressed
+                p1 = p1 + 2
+                If p1 >= 10 Then
+                    p1 = 0
+                    cool1$ = Chr$(177)
+                    Locate 12, 47: Print Space$(10)
+                Else
+                    cool1$ = cool1$ + Chr$(177) + Chr$(177)
+                End If
+                Color 8
+                Locate 12, 47: Print cool1$
+                Color mycolor
+                _Limit 60
+        End Select
+    Loop
+    code$ = current2$
+    ender2$ = ""
+    test2$ = ""
+    current2$ = ""
+    pass$ = ""
+    Color mycolor
+    If UCase$(code$) = "IDDQD" Then
+        super.access = 1
+        mylevel$ = "INVINCIBLE"
+        spunts$ = "off"
+        punts$ = "off"
+        Do While Val(num$) < 10
+            num$ = Right$(Str$(Int(Rnd * 19) + 1), 2)
+        Loop
+        mycomputer$ = "ET2898-" + num$
+    ElseIf UCase$(code$) = "ANTI" Then
+        mylevel$ = "PROTECTED"
+        punts$ = "off"
+    End If
+    Timer On
+End If
+Return
 
 '*********************
 join.channel:
 '*********************
-TIMER ON
-ON TIMER(1) GOSUB time.loop
+Timer On
+On Timer(1) GoSub time.loop
 mychannel$ = "MAIN"
-GOSUB channel.message
-OPEN filename$ FOR APPEND SHARED AS #1
- a$ = myclient$ + " just entered the chat room..."
- WRITE #1, a$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
- a$ = ""
-CLOSE #1
-RETURN
+GoSub channel.message
+Open filename$ For Append Shared As #1
+a$ = myclient$ + " just entered the chat room..."
+Write #1, a$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
+a$ = ""
+Close #1
+Return
 
 '*********************
 message.loop:
 '*********************
-DO
- GOSUB input.message
- IF say$ = "" OR say$ = " " THEN
-  BEEP
- ELSE
-  mycount = mycount + 1
-  write.say.message = 1
- END IF
- Message$ = ""
- current$ = ""
- test$ = ""
- ender$ = "false"
-LOOP
+Do
+    GoSub input.message
+    If say$ = "" Or say$ = " " Then
+        Beep
+    Else
+        mycount = mycount + 1
+        write.say.message = 1
+    End If
+    Message$ = ""
+    current$ = ""
+    test$ = ""
+    ender$ = "false"
+Loop
 
 '*********************
 chat.log.loop:
 '*********************
-IF write.rename.message = 1 THEN GOSUB write.rename
-IF write.join.message = 1 THEN GOSUB write.join
-IF write.punt.message = 1 THEN GOSUB write.punt
-IF write.who.messages = 1 THEN GOSUB write.who
-IF write.say.message = 1 THEN GOSUB write.say
-OPEN filename$ FOR INPUT SHARED AS #255
- DO WHILE NOT EOF(255)
-  INPUT #255, what$, Client$, ccolor, channel$, who$
-  GOSUB Message.Display
-  GOSUB Who.asked
- LOOP
-CLOSE #255
-GOSUB print.buffer
-IF punts$ <> "off" AND who$ = "punt" + myclient$ THEN GOTO punt.Em
-IF spunts$ <> "off" AND who$ = "spunt" + myclient$ THEN GOTO punt.Em
-GOSUB who.response
-RETURN
+If write.rename.message = 1 Then GoSub write.rename
+If write.join.message = 1 Then GoSub write.join
+If write.punt.message = 1 Then GoSub write.punt
+If write.who.messages = 1 Then GoSub write.who
+If write.say.message = 1 Then GoSub write.say
+Open filename$ For Input Shared As #255
+Do While Not EOF(255)
+    Input #255, what$, Client$, ccolor, channel$, who$
+    GoSub Message.Display
+    GoSub Who.asked
+Loop
+Close #255
+GoSub print.buffer
+If punts$ <> "off" And who$ = "punt" + myclient$ Then GoTo punt.Em
+If spunts$ <> "off" And who$ = "spunt" + myclient$ Then GoTo punt.Em
+GoSub who.response
+Return
 
 '*********************
 write.rename:
 '*********************
-OPEN filename$ FOR APPEND SHARED AS #1
- what$ = "[ " + myclient.old$ + " ] changed their name to [ " + myclient$ + " ]"
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
-CLOSE #1
+Open filename$ For Append Shared As #1
+what$ = "[ " + myclient.old$ + " ] changed their name to [ " + myclient$ + " ]"
+Write #1, what$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
+Close #1
 write.rename.message = 0
-RETURN
+Return
 
 '*********************
 write.join:
 '*********************
-OPEN filename$ FOR APPEND SHARED AS #1
- what$ = myclient$ + " left #" + mychannel.old$
- WRITE #1, what$, "NWG HOST", host.color, mychannel.old$, "not" + myrandom$
- what$ = myclient$ + " entered #" + mychannel$
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
-CLOSE #1
-GOSUB channel.message
+Open filename$ For Append Shared As #1
+what$ = myclient$ + " left #" + mychannel.old$
+Write #1, what$, "NWG HOST", host.color, mychannel.old$, "not" + myrandom$
+what$ = myclient$ + " entered #" + mychannel$
+Write #1, what$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
+Close #1
+GoSub channel.message
 write.join.message = 0
-RETURN
+Return
 
 '*********************
 write.punt:
 '*********************
-OPEN filename$ FOR APPEND SHARED AS #1
- IF super.access = 1 THEN
-  WRITE #1, "", "NWG HOST", 6, mychannel$, "spunt" + them$
- ELSE
-  WRITE #1, "", "NWG HOST", 6, mychannel$, "punt" + them$
- END IF
-CLOSE #1
+Open filename$ For Append Shared As #1
+If super.access = 1 Then
+    Write #1, "", "NWG HOST", 6, mychannel$, "spunt" + them$
+Else
+    Write #1, "", "NWG HOST", 6, mychannel$, "punt" + them$
+End If
+Close #1
 write.punt.message = 0
-RETURN
+Return
 
 '*********************
 write.who:
 '*********************
-IF who.n = 0 THEN
- OPEN filename$ FOR APPEND SHARED AS #1
-  WRITE #1, "", myrandom$, 0, mychannel$, "who"
-  what$ = "Handle      Channel     Computer    Punting     Line Rate"
-  WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
-  l$ = STRING$(10, 196)
-  what$ = l$ + SPACE$(2) + l$ + SPACE$(2) + l$ + SPACE$(2) + l$ + SPACE$(2) + l$
-  WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
-  l = 12 - LEN(myclient$)
-  l2 = 11 - LEN(mychannel$)
-  l3 = 12 - LEN(mycomputer$)
-  l4 = 13 - LEN(mylevel$)
-  what$ = myclient$ + SPACE$(l) + "#" + mychannel$ + SPACE$(l2) + mycomputer$ + SPACE$(l3) + mylevel$ + SPACE$(l4) + mympm$
-  WRITE #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
- CLOSE #1
- who.n = 1
-ELSE
- OPEN filename$ FOR APPEND SHARED AS #1
-  WRITE #1, "", myrandom$, 0, mychannel$, "thanks"
- CLOSE #1
- who.n = 0
- write.who.messages = 0
-END IF
-RETURN
+If who.n = 0 Then
+    Open filename$ For Append Shared As #1
+    Write #1, "", myrandom$, 0, mychannel$, "who"
+    what$ = "Handle      Channel     Computer    Punting     Line Rate"
+    Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+    l$ = String$(10, 196)
+    what$ = l$ + Space$(2) + l$ + Space$(2) + l$ + Space$(2) + l$ + Space$(2) + l$
+    Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+    l = 12 - Len(myclient$)
+    l2 = 11 - Len(mychannel$)
+    l3 = 12 - Len(mycomputer$)
+    l4 = 13 - Len(mylevel$)
+    what$ = myclient$ + Space$(l) + "#" + mychannel$ + Space$(l2) + mycomputer$ + Space$(l3) + mylevel$ + Space$(l4) + mympm$
+    Write #1, what$, "NWG HOST", host.color, mychannel$, myrandom$
+    Close #1
+    who.n = 1
+Else
+    Open filename$ For Append Shared As #1
+    Write #1, "", myrandom$, 0, mychannel$, "thanks"
+    Close #1
+    who.n = 0
+    write.who.messages = 0
+End If
+Return
 
 '*********************
 write.say:
 '*********************
- OPEN filename$ FOR APPEND SHARED AS #1
-  WRITE #1, say$, myclient$, mycolor, mychannel$, "all"
- CLOSE #1
- write.say.message = 0
-RETURN
+Open filename$ For Append Shared As #1
+Write #1, say$, myclient$, mycolor, mychannel$, "all"
+Close #1
+write.say.message = 0
+Return
 
 '*********************
 Message.Display:
 '*********************
-IF channel$ = mychannel$ OR channel$ = "all" THEN
- IF LEFT$(who$, 3) = "not" THEN
-  IF MID$(who$, 4) <> myrandom$ THEN GOSUB Create.Buffer
- END IF
- IF who$ = myrandom$ THEN GOSUB Create.Buffer
- IF who$ = "all" THEN GOSUB Create.Buffer
-END IF
-RETURN
+If channel$ = mychannel$ Or channel$ = "all" Then
+    If Left$(who$, 3) = "not" Then
+        If Mid$(who$, 4) <> myrandom$ Then GoSub Create.Buffer
+    End If
+    If who$ = myrandom$ Then GoSub Create.Buffer
+    If who$ = "all" Then GoSub Create.Buffer
+End If
+Return
 
 '*********************
 who.response:
 '*********************
-IF tell = 1 THEN
- OPEN filename$ FOR APPEND SHARED AS #1
-  l = 12 - LEN(myclient$)
-  l2 = 11 - LEN(mychannel$)
-  l3 = 12 - LEN(mycomputer$)
-  l4 = 13 - LEN(mylevel$)
-  what$ = myclient$ + SPACE$(l) + "#" + mychannel$ + SPACE$(l2) + mycomputer$ + SPACE$(l3) + mylevel$ + SPACE$(l4) + mympm$
-  WRITE #1, what$, "NWG HOST", host.color, tell.channel$, tell.who$
- CLOSE #1
- tell = 0
- tell.who$ = ""
- tell.channel$ = ""
-END IF
-RETURN
+If tell = 1 Then
+    Open filename$ For Append Shared As #1
+    l = 12 - Len(myclient$)
+    l2 = 11 - Len(mychannel$)
+    l3 = 12 - Len(mycomputer$)
+    l4 = 13 - Len(mylevel$)
+    what$ = myclient$ + Space$(l) + "#" + mychannel$ + Space$(l2) + mycomputer$ + Space$(l3) + mylevel$ + Space$(l4) + mympm$
+    Write #1, what$, "NWG HOST", host.color, tell.channel$, tell.who$
+    Close #1
+    tell = 0
+    tell.who$ = ""
+    tell.channel$ = ""
+End If
+Return
 
 '*********************
 Who.asked:
 '*********************
-IF who$ = "who" THEN
- tell = 1
- tell.who$ = Client$
- tell.channel$ = channel$
-END IF
-l = 12 - LEN(myclient$)
-l2 = 11 - LEN(mychannel$)
-l3 = 12 - LEN(mycomputer$)
-l4 = 13 - LEN(mylevel$)
-this$ = myclient$ + SPACE$(l) + "#" + mychannel$ + SPACE$(l2) + mycomputer$ + SPACE$(l3) + mylevel$ + SPACE$(l4) + mympm$
-IF who$ = "thanks" OR what$ = this$ THEN
- tell = 0
- tell.who$ = ""
- tell.channel$ = ""
-END IF
-RETURN
+If who$ = "who" Then
+    tell = 1
+    tell.who$ = Client$
+    tell.channel$ = channel$
+End If
+l = 12 - Len(myclient$)
+l2 = 11 - Len(mychannel$)
+l3 = 12 - Len(mycomputer$)
+l4 = 13 - Len(mylevel$)
+this$ = myclient$ + Space$(l) + "#" + mychannel$ + Space$(l2) + mycomputer$ + Space$(l3) + mylevel$ + Space$(l4) + mympm$
+If who$ = "thanks" Or what$ = this$ Then
+    tell = 0
+    tell.who$ = ""
+    tell.channel$ = ""
+End If
+Return
 
 '*********************
 input.message:
 '*********************
-DO WHILE ender$ <> "true"                               ' if not end go
- k& = _KEYHIT
- ctrlDown = _KEYDOWN(100305) OR _KEYDOWN(100306)        ' Left or Right CTRL
- SELECT CASE k&
-  CASE 15104: GOSUB help.screen: GOTO input.msg.resume   ' F1
-  CASE 97, 65                                            ' A
-   IF ctrlDown THEN GOSUB anti.command: GOTO input.msg.resume ELSE GOTO type.char
-  CASE 110, 78                                           ' N
-   IF ctrlDown THEN GOSUB rename.command: GOTO input.msg.resume ELSE GOTO type.char
-  CASE 104, 72                                           ' H
-   IF ctrlDown THEN GOSUB hack.command: GOTO input.msg.resume ELSE GOTO type.char
-  CASE 120, 88                                           ' X
-   IF ctrlDown THEN GOSUB exit.chat ELSE GOTO type.char
-  CASE 119, 87                                           ' W
-   IF ctrlDown THEN GOSUB who.command: GOTO input.msg.resume ELSE GOTO type.char
-  CASE 99, 67                                            ' C
-   IF ctrlDown THEN GOSUB Change.Color: GOTO input.msg.resume ELSE GOTO type.char
-  CASE 103, 71                                           ' G (join/Go to channel)
-   IF ctrlDown THEN GOSUB join.command: GOTO input.msg.resume ELSE GOTO type.char
-  CASE 112, 80                                           ' P
-   IF ctrlDown THEN GOSUB punt.command: GOTO input.msg.resume ELSE GOTO type.char
-  CASE 8                                                 ' BACKSPACE
-   IF LEN(current$) > 0 THEN
-    current$ = LEFT$(current$, LEN(current$) - 1)
-    COLOR 8: LOCATE 21, 3: PRINT STRING$(62, 250)
-    COLOR mycolor: LOCATE 21, 3: PRINT current$
-   END IF
-  CASE 13                                                ' ENTER
-   ender$ = "true"
-  CASE 32 TO 126                                         ' Printable ASCII
-type.char:
-   IF ctrlDown = 0 THEN                                  ' Only if CTRL not held
-    IF k& <> 34 THEN                                     ' Not quote char
-     IF LEN(current$) < 62 THEN
-      current$ = current$ + CHR$(k&)
-      LOCATE 21, 3: PRINT current$
-     ELSE
-      BEEP
-     END IF
-    END IF
-   END IF
-  CASE 0                                                 ' No key pressed
-   _LIMIT 60
- END SELECT
-LOOP                                                    'LOOP until enter
-GOTO input.msg.done
+Do While ender$ <> "true" ' if not end go
+    k& = _KeyHit
+    ctrlDown = _KeyDown(100305) Or _KeyDown(100306) ' Left or Right CTRL
+    Select Case k&
+        Case 15104: GoSub help.screen: GoTo input.msg.resume ' F1
+        Case 97, 65 ' A
+            If ctrlDown Then GoSub anti.command: GoTo input.msg.resume Else GoTo type.char
+        Case 110, 78 ' N
+            If ctrlDown Then GoSub rename.command: GoTo input.msg.resume Else GoTo type.char
+        Case 104, 72 ' H
+            If ctrlDown Then GoSub hack.command: GoTo input.msg.resume Else GoTo type.char
+        Case 120, 88 ' X
+            If ctrlDown Then GoSub exit.chat Else GoTo type.char
+        Case 119, 87 ' W
+            If ctrlDown Then GoSub who.command: GoTo input.msg.resume Else GoTo type.char
+        Case 99, 67 ' C
+            If ctrlDown Then GoSub Change.Color: GoTo input.msg.resume Else GoTo type.char
+        Case 103, 71 ' G (join/Go to channel)
+            If ctrlDown Then GoSub join.command: GoTo input.msg.resume Else GoTo type.char
+        Case 112, 80 ' P
+            If ctrlDown Then GoSub punt.command: GoTo input.msg.resume Else GoTo type.char
+        Case 8 ' BACKSPACE
+            If Len(current$) > 0 Then
+                current$ = Left$(current$, Len(current$) - 1)
+                Color 8: Locate 21, 3: Print String$(62, 250)
+                Color mycolor: Locate 21, 3: Print current$
+            End If
+        Case 13 ' ENTER
+            ender$ = "true"
+        Case 32 To 126 ' Printable ASCII
+            type.char:
+            If ctrlDown = 0 Then ' Only if CTRL not held
+                If k& <> 34 Then ' Not quote char
+                    If Len(current$) < 62 Then
+                        current$ = current$ + Chr$(k&)
+                        Locate 21, 3: Print current$
+                    Else
+                        Beep
+                    End If
+                End If
+            End If
+        Case 0 ' No key pressed
+            _Limit 60
+    End Select
+Loop 'LOOP until enter
+GoTo input.msg.done
 input.msg.resume:
- LOCATE 21, 3: PRINT current$                            ' Redisplay after handler
- GOTO input.message
+Locate 21, 3: Print current$ ' Redisplay after handler
+GoTo input.message
 input.msg.done:
 say$ = current$
-COLOR 8
-LOCATE 21, 3: PRINT STRING$(62, 250)
-COLOR mycolor
-RETURN
+Color 8
+Locate 21, 3: Print String$(62, 250)
+Color mycolor
+Return
 
 '*********************
 flashit:
 '*********************
- p = p + 2
- IF p >= 10 THEN
-  p = 0
-  cool$ = CHR$(177)
-  LOCATE 21, 68: PRINT SPACE$(10)
- ELSE
-  cool$ = cool$ + CHR$(177) + CHR$(177)
- END IF
- LOCATE 21, 68: PRINT cool$
-RETURN
+p = p + 2
+If p >= 10 Then
+    p = 0
+    cool$ = Chr$(177)
+    Locate 21, 68: Print Space$(10)
+Else
+    cool$ = cool$ + Chr$(177) + Chr$(177)
+End If
+Locate 21, 68: Print cool$
+Return
 
 '*********************
 exit.chat:
 '*********************
-IF online = 1 THEN
- ON ERROR GOTO 0
- TIMER OFF
- SLEEP 1
- CLOSE
- OPEN filename$ FOR APPEND SHARED AS #1
-  Message$ = myclient$ + " left the chat room..."
-  WRITE #1, Message$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
- CLOSE #1
-END IF
-COLOR 7
-CLS
-SYSTEM
+If online = 1 Then
+    On Error GoTo 0
+    Timer Off
+    Sleep 1
+    Close
+    Open filename$ For Append Shared As #1
+    Message$ = myclient$ + " left the chat room..."
+    Write #1, Message$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
+    Close #1
+End If
+Color 7
+Cls
+System
 
 '*********************
 punt.Em:
 '*********************
-TIMER OFF
-OPEN filename$ FOR APPEND SHARED AS #1
- what$ = myclient$ + " was kicked out of the chat room..."
- WRITE #1, what$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
-CLOSE #1
+Timer Off
+Open filename$ For Append Shared As #1
+what$ = myclient$ + " was kicked out of the chat room..."
+Write #1, what$, "NWG HOST", host.color, mychannel$, "not" + myrandom$
+Close #1
 what$ = "You've been kicked out of the chat room..."
 Client$ = "NWG HOST"
 ccolor = host.color
-GOSUB Create.Buffer
-GOSUB print.buffer
-END
+GoSub Create.Buffer
+GoSub print.buffer
+End
 
 '*********************
 Create.Buffer:
@@ -830,241 +831,241 @@ buffer4c = buffer3c
 buffer3c = buffer2c
 buffer2c = buffer1c
 buffer1c = ccolor
-RETURN
+Return
 
 '*********************
 print.buffer:
 '*********************
 s$ = "\         \ \                                                            \"
-COLOR buffer13c
-LOCATE 6, 4: PRINT USING s$; buffer13n$; buffer13$
-COLOR buffer12c
-LOCATE 7, 4: PRINT USING s$; buffer12n$; buffer12$
-COLOR buffer11c
-LOCATE 8, 4: PRINT USING s$; buffer11n$; buffer11$
-COLOR buffer10c
-LOCATE 9, 4: PRINT USING s$; buffer10n$; buffer10$
-COLOR buffer9c
-LOCATE 10, 4: PRINT USING s$; buffer9n$; buffer9$
-COLOR buffer8c
-LOCATE 11, 4: PRINT USING s$; buffer8n$; buffer8$
-COLOR buffer7c
-LOCATE 12, 4: PRINT USING s$; buffer7n$; buffer7$
-COLOR buffer6c
-LOCATE 13, 4: PRINT USING s$; buffer6n$; buffer6$
-COLOR buffer5c
-LOCATE 14, 4: PRINT USING s$; buffer5n$; buffer5$
-COLOR buffer4c
-LOCATE 15, 4: PRINT USING s$; buffer4n$; buffer4$
-COLOR buffer3c
-LOCATE 16, 4: PRINT USING s$; buffer3n$; buffer3$
-COLOR buffer2c
-LOCATE 17, 4: PRINT USING s$; buffer2n$; buffer2$
-COLOR buffer1c
-LOCATE 18, 4: PRINT USING s$; buffer1n$; buffer1$
-COLOR mycolor
-RETURN
+Color buffer13c
+Locate 6, 4: Print Using s$; buffer13n$; buffer13$
+Color buffer12c
+Locate 7, 4: Print Using s$; buffer12n$; buffer12$
+Color buffer11c
+Locate 8, 4: Print Using s$; buffer11n$; buffer11$
+Color buffer10c
+Locate 9, 4: Print Using s$; buffer10n$; buffer10$
+Color buffer9c
+Locate 10, 4: Print Using s$; buffer9n$; buffer9$
+Color buffer8c
+Locate 11, 4: Print Using s$; buffer8n$; buffer8$
+Color buffer7c
+Locate 12, 4: Print Using s$; buffer7n$; buffer7$
+Color buffer6c
+Locate 13, 4: Print Using s$; buffer6n$; buffer6$
+Color buffer5c
+Locate 14, 4: Print Using s$; buffer5n$; buffer5$
+Color buffer4c
+Locate 15, 4: Print Using s$; buffer4n$; buffer4$
+Color buffer3c
+Locate 16, 4: Print Using s$; buffer3n$; buffer3$
+Color buffer2c
+Locate 17, 4: Print Using s$; buffer2n$; buffer2$
+Color buffer1c
+Locate 18, 4: Print Using s$; buffer1n$; buffer1$
+Color mycolor
+Return
 
 '********************
 Change.Color:
 '********************
-TIMER OFF
-GOSUB draw.menu
-GOSUB menu.loop
-GOSUB draw.program
-IF online <> 1 THEN GOSUB welcome.message
-TIMER ON
-RETURN
+Timer Off
+GoSub draw.menu
+GoSub menu.loop
+GoSub draw.program
+If online <> 1 Then GoSub welcome.message
+Timer On
+Return
 
 '********************
 draw.menu:
 '********************
-COLOR mycolor
-LOCATE 6, 24: PRINT CHR$(218); STRING$(30, 196); CHR$(191)
-FOR m = 7 TO 18
- LOCATE m, 24: PRINT CHR$(179); SPACE$(30); CHR$(179)
-NEXT m
-LOCATE 19, 24: PRINT CHR$(192); STRING$(30, 196); CHR$(217)
-COLOR 15
-LOCATE 7, 29: PRINT "Network Graffiti Color"
-LOCATE 18, 26: PRINT "[TAB] Choose, [ENTER] Select"
-COLOR 7
-LOCATE 9, 27: PRINT "Dark Blue"
-LOCATE 10, 27: PRINT "Dark Green"
-LOCATE 11, 27: PRINT "Dark Cyan"
-LOCATE 12, 27: PRINT "Dark Red"
-LOCATE 13, 27: PRINT "Magenta"
-LOCATE 14, 27: PRINT "Brown"
-LOCATE 15, 27: PRINT "Dark White"
-LOCATE 16, 27: PRINT "Gray"
-LOCATE 9, 41: PRINT "Bright Blue"
-LOCATE 10, 41: PRINT "Bright Green"
-LOCATE 11, 41: PRINT "Bright Cyan"
-LOCATE 12, 41: PRINT "Bright Red"
-LOCATE 13, 41: PRINT "Pink"
-LOCATE 14, 41: PRINT "Yellow"
-LOCATE 15, 41: PRINT "Bright White"
-RETURN
+Color mycolor
+Locate 6, 24: Print Chr$(218); String$(30, 196); Chr$(191)
+For m = 7 To 18
+    Locate m, 24: Print Chr$(179); Space$(30); Chr$(179)
+Next m
+Locate 19, 24: Print Chr$(192); String$(30, 196); Chr$(217)
+Color 15
+Locate 7, 29: Print "Network Graffiti Color"
+Locate 18, 26: Print "[TAB] Choose, [ENTER] Select"
+Color 7
+Locate 9, 27: Print "Dark Blue"
+Locate 10, 27: Print "Dark Green"
+Locate 11, 27: Print "Dark Cyan"
+Locate 12, 27: Print "Dark Red"
+Locate 13, 27: Print "Magenta"
+Locate 14, 27: Print "Brown"
+Locate 15, 27: Print "Dark White"
+Locate 16, 27: Print "Gray"
+Locate 9, 41: Print "Bright Blue"
+Locate 10, 41: Print "Bright Green"
+Locate 11, 41: Print "Bright Cyan"
+Locate 12, 41: Print "Bright Red"
+Locate 13, 41: Print "Pink"
+Locate 14, 41: Print "Yellow"
+Locate 15, 41: Print "Bright White"
+Return
 
 '****************
 menu.loop:
 '****************
 menu.line = mycolor
-COLOR menu.line, 0
-GOSUB menu.lines
-COLOR 7, 0
-DO WHILE endloop$ <> "true"
- k& = _KEYHIT
- SELECT CASE k&
-  CASE 13: endloop$ = "true"                              ' ENTER
-  CASE 9: menu$ = "down": GOSUB menu2                     ' TAB
-  CASE 25: menu$ = "up": GOSUB menu2                      ' SHIFT+TAB
-  CASE 20480, 18432                                       ' DOWN, UP arrows
-   IF k& = 20480 THEN menu$ = "down" ELSE menu$ = "up"
-   GOSUB menu2
-  CASE 19712, 19200                                       ' RIGHT, LEFT arrows
-   IF k& = 19712 THEN
-    IF menu.line <= 7 THEN menu.line = menu.line + 8: GOSUB draw.menu: COLOR menu.line, 0: GOSUB menu.lines
-   ELSE
-    IF menu.line >= 9 THEN menu.line = menu.line - 8: GOSUB draw.menu: COLOR menu.line, 0: GOSUB menu.lines
-   END IF
- END SELECT
- _LIMIT 60
-LOOP
+Color menu.line, 0
+GoSub menu.lines
+Color 7, 0
+Do While endloop$ <> "true"
+    k& = _KeyHit
+    Select Case k&
+        Case 13: endloop$ = "true" ' ENTER
+        Case 9: menu$ = "down": GoSub menu2 ' TAB
+        Case 25: menu$ = "up": GoSub menu2 ' SHIFT+TAB
+        Case 20480, 18432 ' DOWN, UP arrows
+            If k& = 20480 Then menu$ = "down" Else menu$ = "up"
+            GoSub menu2
+        Case 19712, 19200 ' RIGHT, LEFT arrows
+            If k& = 19712 Then
+                If menu.line <= 7 Then menu.line = menu.line + 8: GoSub draw.menu: Color menu.line, 0: GoSub menu.lines
+            Else
+                If menu.line >= 9 Then menu.line = menu.line - 8: GoSub draw.menu: Color menu.line, 0: GoSub menu.lines
+            End If
+    End Select
+    _Limit 60
+Loop
 endloop$ = ""
 kepress$ = ""
-IF menu.line = 1 THEN mycolor = 1
-IF menu.line = 2 THEN mycolor = 2
-IF menu.line = 3 THEN mycolor = 3
-IF menu.line = 4 THEN mycolor = 4
-IF menu.line = 5 THEN mycolor = 5
-IF menu.line = 6 THEN mycolor = 6
-IF menu.line = 7 THEN mycolor = 7
-IF menu.line = 8 THEN mycolor = 8
-IF menu.line = 9 THEN mycolor = 9
-IF menu.line = 10 THEN mycolor = 10
-IF menu.line = 11 THEN mycolor = 11
-IF menu.line = 12 THEN mycolor = 12
-IF menu.line = 13 THEN mycolor = 13
-IF menu.line = 14 THEN mycolor = 14
-IF menu.line = 15 THEN mycolor = 15
-RETURN
+If menu.line = 1 Then mycolor = 1
+If menu.line = 2 Then mycolor = 2
+If menu.line = 3 Then mycolor = 3
+If menu.line = 4 Then mycolor = 4
+If menu.line = 5 Then mycolor = 5
+If menu.line = 6 Then mycolor = 6
+If menu.line = 7 Then mycolor = 7
+If menu.line = 8 Then mycolor = 8
+If menu.line = 9 Then mycolor = 9
+If menu.line = 10 Then mycolor = 10
+If menu.line = 11 Then mycolor = 11
+If menu.line = 12 Then mycolor = 12
+If menu.line = 13 Then mycolor = 13
+If menu.line = 14 Then mycolor = 14
+If menu.line = 15 Then mycolor = 15
+Return
 
 '****************
 menu2:
 '****************
-GOSUB draw.menu
-IF menu$ = "down" THEN
- menu.line = menu.line + 1
- IF menu.line >= 16 THEN menu.line = 1
-ELSEIF menu$ = "up" THEN
- menu.line = menu.line - 1
- IF menu.line <= 0 THEN menu.line = 15
-END IF
-COLOR menu.line, 0
-GOSUB menu.lines
-RETURN
+GoSub draw.menu
+If menu$ = "down" Then
+    menu.line = menu.line + 1
+    If menu.line >= 16 Then menu.line = 1
+ElseIf menu$ = "up" Then
+    menu.line = menu.line - 1
+    If menu.line <= 0 Then menu.line = 15
+End If
+Color menu.line, 0
+GoSub menu.lines
+Return
 
 '****************
 menu.lines:
 '****************
-IF menu.line < 9 THEN LOCATE menu.line - 1 + 9, 26: PRINT CHR$(16)
-IF menu.line > 8 THEN LOCATE menu.line, 40: PRINT CHR$(16)
-IF menu.line = 1 THEN LOCATE 9, 27: PRINT "Dark Blue"
-IF menu.line = 2 THEN LOCATE 10, 27: PRINT "Dark Green"
-IF menu.line = 3 THEN LOCATE 11, 27: PRINT "Dark Cyan"
-IF menu.line = 4 THEN LOCATE 12, 27: PRINT "Dark Red"
-IF menu.line = 5 THEN LOCATE 13, 27: PRINT "Magenta"
-IF menu.line = 6 THEN LOCATE 14, 27: PRINT "Brown"
-IF menu.line = 7 THEN LOCATE 15, 27: PRINT "Dark White"
-IF menu.line = 8 THEN LOCATE 16, 27: PRINT "Gray"
-IF menu.line = 9 THEN LOCATE 9, 41: PRINT "Bright Blue"
-IF menu.line = 10 THEN LOCATE 10, 41: PRINT "Bright Green"
-IF menu.line = 11 THEN LOCATE 11, 41: PRINT "Bright Cyan"
-IF menu.line = 12 THEN LOCATE 12, 41: PRINT "Bright Red"
-IF menu.line = 13 THEN LOCATE 13, 41: PRINT "Pink"
-IF menu.line = 14 THEN LOCATE 14, 41: PRINT "Yellow"
-IF menu.line = 15 THEN LOCATE 15, 41: PRINT "Bright White"
-COLOR 7, 0
-RETURN
+If menu.line < 9 Then Locate menu.line - 1 + 9, 26: Print Chr$(16)
+If menu.line > 8 Then Locate menu.line, 40: Print Chr$(16)
+If menu.line = 1 Then Locate 9, 27: Print "Dark Blue"
+If menu.line = 2 Then Locate 10, 27: Print "Dark Green"
+If menu.line = 3 Then Locate 11, 27: Print "Dark Cyan"
+If menu.line = 4 Then Locate 12, 27: Print "Dark Red"
+If menu.line = 5 Then Locate 13, 27: Print "Magenta"
+If menu.line = 6 Then Locate 14, 27: Print "Brown"
+If menu.line = 7 Then Locate 15, 27: Print "Dark White"
+If menu.line = 8 Then Locate 16, 27: Print "Gray"
+If menu.line = 9 Then Locate 9, 41: Print "Bright Blue"
+If menu.line = 10 Then Locate 10, 41: Print "Bright Green"
+If menu.line = 11 Then Locate 11, 41: Print "Bright Cyan"
+If menu.line = 12 Then Locate 12, 41: Print "Bright Red"
+If menu.line = 13 Then Locate 13, 41: Print "Pink"
+If menu.line = 14 Then Locate 14, 41: Print "Yellow"
+If menu.line = 15 Then Locate 15, 41: Print "Bright White"
+Color 7, 0
+Return
 
 '*********************
 time.loop:
 '*********************
 time = time + 1
-minutes = INT(time / 60)
-seconds = INT(time - (60 * minutes))
-COLOR 7, 0
-LOCATE 1, 3: PRINT SPACE$(70)
-IF minutes = 0 THEN
- LOCATE 1, 3: PRINT "Connected for"; seconds; "seconds(s)"
-ELSE
- LOCATE 1, 3: PRINT "Connected for"; minutes; "minute(s),"; seconds; "seconds(s)"
-END IF
-T$ = TIME$
-Hr = VAL(T$)
-IF Hr < 12 THEN Ampm$ = " AM" ELSE Ampm$ = " PM"
-IF Hr > 12 THEN Hr = Hr - 12
-LOCATE 1, 68: PRINT STR$(Hr); RIGHT$(T$, 6); Ampm$
-IF mycount <> 0 THEN
- IF minutes = 0 THEN
-  per = INT((mycount / seconds) * 60)
- ELSE
-  per = INT((mycount / time) * 60)
- END IF
-ELSE
- per = 0
-END IF
-mympm1$ = STR$(per) + " Messages Per Minute   "
-mympm$ = STR$(per) + " MPM"
-LOCATE 23, 2: PRINT mympm1$
-COLOR 8
-GOSUB flashit
-COLOR mycolor, 0
-GOSUB chat.log.loop
-RETURN
+minutes = Int(time / 60)
+seconds = Int(time - (60 * minutes))
+Color 7, 0
+Locate 1, 3: Print Space$(70)
+If minutes = 0 Then
+    Locate 1, 3: Print "Connected for"; seconds; "seconds(s)"
+Else
+    Locate 1, 3: Print "Connected for"; minutes; "minute(s),"; seconds; "seconds(s)"
+End If
+T$ = Time$
+Hr = Val(T$)
+If Hr < 12 Then Ampm$ = " AM" Else Ampm$ = " PM"
+If Hr > 12 Then Hr = Hr - 12
+Locate 1, 68: Print Str$(Hr); Right$(T$, 6); Ampm$
+If mycount <> 0 Then
+    If minutes = 0 Then
+        per = Int((mycount / seconds) * 60)
+    Else
+        per = Int((mycount / time) * 60)
+    End If
+Else
+    per = 0
+End If
+mympm1$ = Str$(per) + " Messages Per Minute   "
+mympm$ = Str$(per) + " MPM"
+Locate 23, 2: Print mympm1$
+Color 8
+GoSub flashit
+Color mycolor, 0
+GoSub chat.log.loop
+Return
 
 '****************
 input.prompts:
 '****************
-DO WHILE ender2$ <> "true"
- k& = _KEYHIT
- SELECT CASE k&
-  CASE 13                                                ' ENTER
-   ender2$ = "true"
-  CASE 8                                                 ' BACKSPACE
-   IF LEN(current2$) > 0 THEN
-    current2$ = LEFT$(current2$, LEN(current2$) - 1)
-    COLOR mycolor
-    LOCATE by, bx: PRINT "[ " + SPACE$(10) + " ]"
-    COLOR 8
-    LOCATE py, px: PRINT STRING$(10, 250)
-    COLOR mycolor
-    LOCATE py, px: PRINT current2$
-   END IF
-  CASE 32 TO 126                                         ' Printable ASCII
-   IF k& <> 34 THEN                                      ' Not quote char
-    IF LEN(current2$) < 10 THEN
-     current2$ = current2$ + CHR$(k&)
-     LOCATE py, px: PRINT current2$
-    ELSE
-     BEEP
-    END IF
-   END IF
-  CASE 0                                                 ' No key pressed
-   p1 = p1 + 2
-   IF p1 >= 10 THEN
-    p1 = 0
-    cool1$ = CHR$(177)
-    LOCATE fy, fx: PRINT SPACE$(10)
-   ELSE
-    cool1$ = cool1$ + CHR$(177) + CHR$(177)
-   END IF
-   COLOR 8
-   LOCATE fy, fx: PRINT cool1$
-   COLOR mycolor
-   _LIMIT 60
- END SELECT
-LOOP
-RETURN
+Do While ender2$ <> "true"
+    k& = _KeyHit
+    Select Case k&
+        Case 13 ' ENTER
+            ender2$ = "true"
+        Case 8 ' BACKSPACE
+            If Len(current2$) > 0 Then
+                current2$ = Left$(current2$, Len(current2$) - 1)
+                Color mycolor
+                Locate by, bx: Print "[ " + Space$(10) + " ]"
+                Color 8
+                Locate py, px: Print String$(10, 250)
+                Color mycolor
+                Locate py, px: Print current2$
+            End If
+        Case 32 To 126 ' Printable ASCII
+            If k& <> 34 Then ' Not quote char
+                If Len(current2$) < 10 Then
+                    current2$ = current2$ + Chr$(k&)
+                    Locate py, px: Print current2$
+                Else
+                    Beep
+                End If
+            End If
+        Case 0 ' No key pressed
+            p1 = p1 + 2
+            If p1 >= 10 Then
+                p1 = 0
+                cool1$ = Chr$(177)
+                Locate fy, fx: Print Space$(10)
+            Else
+                cool1$ = cool1$ + Chr$(177) + Chr$(177)
+            End If
+            Color 8
+            Locate fy, fx: Print cool1$
+            Color mycolor
+            _Limit 60
+    End Select
+Loop
+Return
 
