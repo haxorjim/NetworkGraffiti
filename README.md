@@ -23,10 +23,20 @@ Features:
 ## Usage
 
 ```
-GRAFFITI.EXE \\server\share
+graffiti --share <path> [--user <name>]
 ```
 
-Or run without arguments to be prompted for the network path.
+| Option | Description |
+|--------|-------------|
+| `--share <path>` | Path to shared network directory (required) |
+| `--user <name>` | Set chat nickname (skips login prompt) |
+| `--help` | Show help message |
+
+Examples:
+```
+graffiti --share /mnt/network/chat
+graffiti --share //server/share --user Alice
+```
 
 ## Keyboard Commands
 

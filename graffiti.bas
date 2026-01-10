@@ -36,47 +36,65 @@ mycolor = INT(RND * 15) + 1                   'Random Program Color
 host.color = 7                                'NWG HOST color setup
 myrandom$ = STR$(INT(RND * 100000) + 1)       'Users Random Code
 
-IF COMMAND$ = "" THEN
-        CLS
-        COLOR 7
-        PRINT "Network Graffiti: MS-DOS Version"
-        PRINT
-        PRINT "A shared network directory is required to function as"
-        PRINT "a file server for communication between the chat clients."
-        PRINT
-        PRINT "Please enter the common network share you will be using now."
-        PRINT "An invalid path will cause this program to crash!"
-        PRINT
-        PRINT "Example: \\server\share"
-        PRINT
-        INPUT "[\\computer\directory]:", filename$
-ELSEIF COMMAND$ = "/?" THEN
-        COLOR 7
-        PRINT "Network Graffiti - Command Line"
-        PRINT
-        PRINT "The shared network directory can be given at the command line."
-        PRINT "Example: graffiti \\server\share"
-        PRINT
-        END
-ELSE
-        filename$ = COMMAND$
-END IF
-        filename$ = filename$ + "\chat.log"
-        normname$ = filename$
+' Parse command line arguments
+sharepath$ = ""
+username$ = ""
+showhelp = 0
 
-        CLS
-        COLOR 7
-        PRINT "Anti-Hack Mode allows you to escape to a secret chat location."
-        PRINT
-        PRINT "Enter an alternate network path for Anti-Hack Mode,"
-        PRINT "or press ENTER to skip."
-        PRINT
-        PRINT "Example: \\server\secret"
-        PRINT
-        INPUT "[\\computer\directory]:", safefile$
-        IF safefile$ <> "" THEN
-                safefile$ = safefile$ + "\chat.log"
-        END IF
+IF _COMMANDCOUNT = 0 THEN
+ showhelp = 1
+ELSE
+ i = 1
+ WHILE i <= _COMMANDCOUNT
+  arg$ = COMMAND$(i)
+  SELECT CASE arg$
+   CASE "--help", "-h"
+    showhelp = 1
+   CASE "--share"
+    IF i + 1 <= _COMMANDCOUNT THEN
+     i = i + 1
+     sharepath$ = COMMAND$(i)
+    END IF
+   CASE "--user"
+    IF i + 1 <= _COMMANDCOUNT THEN
+     i = i + 1
+     username$ = COMMAND$(i)
+    END IF
+  END SELECT
+  i = i + 1
+ WEND
+END IF
+
+' Show help if requested or missing required args
+IF showhelp = 1 OR sharepath$ = "" THEN
+ COLOR 7
+ PRINT "Network Graffiti"
+ PRINT
+ PRINT "Usage: graffiti --share <path> [options]"
+ PRINT
+ PRINT "Required:"
+ PRINT "  --share <path>    Path to shared network directory"
+ PRINT
+ PRINT "Options:"
+ PRINT "  --user <name>     Set chat nickname (skips login prompt)"
+ PRINT "  --help, -h        Show this help message"
+ PRINT
+ PRINT "Example:"
+ PRINT "  graffiti --share /mnt/network/chat"
+ PRINT "  graffiti --share \\server\share"
+ PRINT
+ END
+END IF
+
+' Detect path separator from share path
+IF INSTR(sharepath$, "\") > 0 THEN
+ pathsep$ = "\"
+ELSE
+ pathsep$ = "/"
+END IF
+filename$ = sharepath$ + pathsep$ + "chat.log"
+normname$ = filename$
+safefile$ = ""
 RETURN
 
 '*********************
@@ -228,27 +246,32 @@ RETURN
 '*********************
 logon.command:
 '*********************
-COLOR mycolor
-LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
-LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
-LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
-LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
-LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
-COLOR 15
-LOCATE 12, 20: PRINT "Handle:"
-COLOR mycolor
-LOCATE 12, 29: PRINT "[ " + SPACE$(10) + " ]"
-COLOR 8
-LOCATE 12, 31: PRINT STRING$(10, 250)
-COLOR mycolor
-fy = 12: fx = 47
-py = 12: px = 31
-by = 12: bx = 29
-GOSUB input.prompts
-myclient$ = current2$
-ender2$ = ""
-test2$ = ""
-current2$ = ""
+' Use --user if provided, otherwise prompt
+IF username$ <> "" THEN
+ myclient$ = username$
+ELSE
+ COLOR mycolor
+ LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
+ LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
+ LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
+ LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
+ LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
+ COLOR 15
+ LOCATE 12, 20: PRINT "Handle:"
+ COLOR mycolor
+ LOCATE 12, 29: PRINT "[ " + SPACE$(10) + " ]"
+ COLOR 8
+ LOCATE 12, 31: PRINT STRING$(10, 250)
+ COLOR mycolor
+ fy = 12: fx = 47
+ py = 12: px = 31
+ by = 12: bx = 29
+ GOSUB input.prompts
+ myclient$ = current2$
+ ender2$ = ""
+ test2$ = ""
+ current2$ = ""
+END IF
 IF myclient$ <> "" AND myclient$ <> " " THEN
  online = 1
  mylevel$ = "VULNERABLE"
