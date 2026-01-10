@@ -9,6 +9,7 @@
 
 # QB64 compiler artifacts
 internal/
+QB64pe/
 
 # Editor backup files
 *~

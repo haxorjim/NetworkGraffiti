@@ -43,11 +43,34 @@ Or run without arguments to be prompted for the network path.
 
 ## Building
 
-Compile with QuickBASIC 4.5 or QB64:
+### Prerequisites (macOS)
 
 ```
-qb64 graffiti.bas -o graffiti.exe
+make install-xcode
 ```
+
+### Install QB64 Phoenix Edition
+
+[QB64 Phoenix Edition](https://github.com/QB64-Phoenix-Edition/QB64pe) is the actively maintained fork of QB64, a modern QuickBASIC compiler that runs on macOS, Windows, and Linux.
+
+```
+make install-qb64pe
+```
+
+### Compile
+
+```
+make build
+```
+
+### All Make Targets
+
+| Target | Description |
+|--------|-------------|
+| `make install-xcode` | Install Xcode command line tools |
+| `make install-qb64pe` | Clone and build QB64 Phoenix Edition |
+| `make build` | Compile graffiti.bas to graffiti.exe |
+| `make clean` | Remove built executable |
 
 ## History
 

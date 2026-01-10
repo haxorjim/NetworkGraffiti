@@ -232,9 +232,9 @@ help.screen:
 TIMER OFF
 GOSUB keys.off
 COLOR mycolor
-LOCATE 3, 6: PRINT "��������������������������������������������������������������������Ŀ"
+LOCATE 3, 6: PRINT CHR$(218); STRING$(68, 196); CHR$(191)
 FOR h = 4 TO 22
- LOCATE h, 6: PRINT "�                                                                    �"
+ LOCATE h, 6: PRINT CHR$(179); SPACE$(68); CHR$(179)
 NEXT h
 COLOR 15
 LOCATE 5, 10: PRINT "                 NETWORK GRAFFITI HELP SCREEN"
@@ -254,7 +254,7 @@ LOCATE 19, 10: PRINT "F3                 Display the Log File"
 COLOR 15
 LOCATE 21, 10: PRINT "        NWG - Copyright (C)1999-"; RIGHT$(DATE$, 4); " haxorjim"
 COLOR mycolor
-LOCATE 23, 6: PRINT "����������������������������������������������������������������������"
+LOCATE 23, 6: PRINT CHR$(192); STRING$(68, 196); CHR$(217)
 DO WHILE INKEY$ = ""
 LOOP
 GOSUB keys.on
@@ -301,11 +301,11 @@ logon.command:
 '*********************
 GOSUB keys.off
 COLOR mycolor
-LOCATE 10, 15: PRINT "����������������������������������������������Ŀ"
-LOCATE 11, 15: PRINT "�                             ������������Ŀ   �"
-LOCATE 12, 15: PRINT "�                             �            �   �"
-LOCATE 13, 15: PRINT "�                             ��������������   �"
-LOCATE 14, 15: PRINT "������������������������������������������������"
+LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
+LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
+LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
+LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
+LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
 COLOR 15
 LOCATE 12, 20: PRINT "Handle:"
 COLOR mycolor
@@ -341,11 +341,11 @@ IF online = 1 THEN
  GOSUB keys.off
  TIMER OFF
  COLOR mycolor
- LOCATE 10, 15: PRINT "����������������������������������������������Ŀ"
- LOCATE 11, 15: PRINT "�                             ������������Ŀ   �"
- LOCATE 12, 15: PRINT "�                             �            �   �"
- LOCATE 13, 15: PRINT "�                             ��������������   �"
- LOCATE 14, 15: PRINT "������������������������������������������������"
+ LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
+ LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
+ LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
+ LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
+ LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
  COLOR 15
  LOCATE 12, 20: PRINT "Handle:"
  COLOR mycolor
@@ -438,11 +438,11 @@ GOSUB keys.off
 TIMER OFF
 mychannel.old$ = mychannel$
 COLOR mycolor
-LOCATE 10, 15: PRINT "����������������������������������������������Ŀ"
-LOCATE 11, 15: PRINT "�                             ������������Ŀ   �"
-LOCATE 12, 15: PRINT "�                             �            �   �"
-LOCATE 13, 15: PRINT "�                             ��������������   �"
-LOCATE 14, 15: PRINT "������������������������������������������������"
+LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
+LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
+LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
+LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
+LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
 COLOR 15
 LOCATE 12, 20: PRINT "Channel:"
 COLOR mycolor
@@ -486,11 +486,11 @@ GOSUB keys.off
 TIMER OFF
 mychannel.old$ = mychannel$
 COLOR mycolor
-LOCATE 10, 15: PRINT "����������������������������������������������Ŀ"
-LOCATE 11, 15: PRINT "�                             ������������Ŀ   �"
-LOCATE 12, 15: PRINT "�                             �            �   �"
-LOCATE 13, 15: PRINT "�                             ��������������   �"
-LOCATE 14, 15: PRINT "������������������������������������������������"
+LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
+LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
+LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
+LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
+LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
 COLOR 15
 LOCATE 12, 20: PRINT "Punt:"
 COLOR mycolor
@@ -522,11 +522,11 @@ IF online = 1 THEN
  TIMER OFF
  GOSUB keys.off
  COLOR mycolor
- LOCATE 10, 15: PRINT "����������������������������������������������Ŀ"
- LOCATE 11, 15: PRINT "�                             ������������Ŀ   �"
- LOCATE 12, 15: PRINT "�                             �            �   �"
- LOCATE 13, 15: PRINT "�                             ��������������   �"
- LOCATE 14, 15: PRINT "������������������������������������������������"
+ LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
+ LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
+ LOCATE 12, 15: PRINT CHR$(179); SPACE$(29); CHR$(179); SPACE$(12); CHR$(179); SPACE$(1); CHR$(179)
+ LOCATE 13, 15: PRINT CHR$(179); SPACE$(29); CHR$(192); STRING$(12, 196); CHR$(217); SPACE$(1); CHR$(179)
+ LOCATE 14, 15: PRINT CHR$(192); STRING$(44, 196); CHR$(217)
  COLOR 15
  LOCATE 12, 20: PRINT "Password:"
  COLOR mycolor
@@ -949,20 +949,11 @@ RETURN
 draw.menu:
 '********************
 COLOR mycolor
-LOCATE 6, 24: PRINT "������������������������������Ŀ"
-LOCATE 7, 24: PRINT "�                              �"
-LOCATE 8, 24: PRINT "�                              �"
-LOCATE 9, 24: PRINT "�                              �"
-LOCATE 10, 24: PRINT "�                              �"
-LOCATE 11, 24: PRINT "�                              �"
-LOCATE 12, 24: PRINT "�                              �"
-LOCATE 13, 24: PRINT "�                              �"
-LOCATE 14, 24: PRINT "�                              �"
-LOCATE 15, 24: PRINT "�                              �"
-LOCATE 16, 24: PRINT "�                              �"
-LOCATE 17, 24: PRINT "�                              �"
-LOCATE 18, 24: PRINT "�                              �"
-LOCATE 19, 24: PRINT "��������������������������������"
+LOCATE 6, 24: PRINT CHR$(218); STRING$(30, 196); CHR$(191)
+FOR m = 7 TO 18
+ LOCATE m, 24: PRINT CHR$(179); SPACE$(30); CHR$(179)
+NEXT m
+LOCATE 19, 24: PRINT CHR$(192); STRING$(30, 196); CHR$(217)
 COLOR 15
 LOCATE 7, 29: PRINT "Network Graffiti Color"
 LOCATE 18, 26: PRINT "[TAB] Choose, [ENTER] Select"
@@ -1035,8 +1026,8 @@ RETURN
 '****************
 menu.lines:
 '****************
-IF menu.line < 9 THEN LOCATE menu.line - 1 + 9, 26: PRINT "�"
-IF menu.line > 8 THEN LOCATE menu.line, 40: PRINT "�"
+IF menu.line < 9 THEN LOCATE menu.line - 1 + 9, 26: PRINT CHR$(16)
+IF menu.line > 8 THEN LOCATE menu.line, 40: PRINT CHR$(16)
 IF menu.line = 1 THEN LOCATE 9, 27: PRINT "Dark Blue"
 IF menu.line = 2 THEN LOCATE 10, 27: PRINT "Dark Green"
 IF menu.line = 3 THEN LOCATE 11, 27: PRINT "Dark Cyan"
