@@ -1,14 +1,22 @@
 '**********************
 '*  Network Graffiti  *
 '**********************
+$Console
 $Resize:Stretch
-Cls
+$ScreenHide
+
+_Dest _Console
 GoSub Initial.Settings
+_Dest 0
+_ScreenShow
+
 GoSub computer.name
 GoSub draw.program
 GoSub welcome.message
+
 framecount = 0
 ctrlDown = 0
+
 Do
     k& = _KeyHit
     ctrlDown = _KeyDown(100305) Or _KeyDown(100306) ' Left or Right CTRL
@@ -84,7 +92,7 @@ If showhelp = 1 Or sharepath$ = "" Then
     Print "  graffiti --share /mnt/network/chat"
     Print "  graffiti --share \\server\share"
     Print
-    End
+    System
 End If
 
 ' Detect path separator from share path

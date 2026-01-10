@@ -6,7 +6,7 @@ A nostalgic LAN chat application for macOS, Linux, and Windows.
 
 ## About
 
-Network Graffiti (NWG) enables real-time text chat over a local network using a shared file as a simple message broker—all clients read and write to the same `chat.log` file on a network drive.
+Network Graffiti enables real-time text chat over a local network using a shared file as a simple message broker—all clients read and write to the same `chat.log` file on a network drive.
 
 ### History
 
@@ -37,7 +37,7 @@ graffiti --share <path> [--user <name>]
 Examples:
 ```
 graffiti --share /mnt/network/chat
-graffiti --share //server/share --user Alice
+graffiti --share \\server\share --user Alice
 ```
 
 ## Keyboard Commands

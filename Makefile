@@ -79,9 +79,10 @@ else
 	@exit 1
 endif
 
-# Remove built executable
+# Remove built executable and generated files
 clean:
 	$(RM) graffiti
+	$(RM) graffiti_start.command
 ifeq ($(OS),Windows_NT)
 	$(RM) graffiti.exe
 endif
