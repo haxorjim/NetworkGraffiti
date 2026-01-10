@@ -17,3 +17,6 @@ QB64pe/
 
 # Runtime logs (chat.log is the live message file)
 chat.log
+
+# Claude Code
+CLAUDE.md

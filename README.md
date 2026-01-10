@@ -71,7 +71,3 @@ make build
 | `make install-qb64pe` | Clone and build QB64 Phoenix Edition |
 | `make build` | Compile graffiti.bas to graffiti.exe |
 | `make clean` | Remove built executable |
-
-## History
-
-Copyright 1999 haxorjim.

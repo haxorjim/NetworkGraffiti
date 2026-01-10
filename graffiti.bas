@@ -4,13 +4,27 @@
 CLS
 GOSUB Initial.Settings
 GOSUB computer.name
-GOSUB key.setup
 GOSUB draw.program
 GOSUB welcome.message
+framecount = 0
+ctrlDown = 0
 DO
-COLOR 8
-GOSUB flashit
-SLEEP 1
+ k& = _KEYHIT
+ ctrlDown = _KEYDOWN(100305) OR _KEYDOWN(100306)         ' Left or Right CTRL
+ SELECT CASE k&
+  CASE 15104: GOSUB help.screen                          ' F1
+  CASE 15360: GOSUB shell.command                        ' F2
+  CASE 15616: GOSUB type.command                         ' F3
+  CASE 108, 76: IF ctrlDown THEN GOSUB logon.command     ' CTRL+L
+  CASE 120, 88: IF ctrlDown THEN GOSUB exit.chat         ' CTRL+X
+ END SELECT
+ framecount = framecount + 1
+ IF framecount >= 30 THEN                                ' Every ~0.5 sec at 60fps
+  COLOR 8
+  GOSUB flashit
+  framecount = 0
+ END IF
+ _LIMIT 60
 LOOP
 'just in case loop dies
 CLS
@@ -77,83 +91,6 @@ FOR scrnpos = 1 TO 10
    mycomputer$ = mycomputer$ + CHR$(number)
 NEXT scrnpos
 IF mycomputer$ = STRING$(10, " ") THEN mycomputer$ = "UNKNOWN"
-RETURN
-
-'*********************
-key.setup:
-'*********************
-ON KEY(1) GOSUB help.screen     'Trap F1
-KEY(1) ON
-ON KEY(2) GOSUB shell.command   'Trap F2
-KEY(2) ON
-ON KEY(3) GOSUB type.command    'Trap F3
-KEY(3) ON
-KEY 17, CHR$(&H4) + CHR$(&H1E)
-ON KEY(17) GOSUB anti.command
-KEY(17) ON                      'Trap CTRL + A
-KEY 18, CHR$(&H4) + CHR$(&H31)
-ON KEY(18) GOSUB rename.command
-KEY(18) ON                      'Trap CTRL + N
-KEY 19, CHR$(&H4) + CHR$(&H23)
-ON KEY(19) GOSUB hack.command
-KEY(19) ON                      'Trap CTRL + H
-KEY 20, CHR$(&H4) + CHR$(&H2D)
-ON KEY(20) GOSUB exit.chat
-KEY(20) ON                      'Trap CTRL + X
-KEY 21, CHR$(&H4) + CHR$(&H11)
-ON KEY(21) GOSUB who.command
-KEY(21) ON                      'Trap CTRL + W
-KEY 22, CHR$(&H4) + CHR$(&H2E)
-ON KEY(22) GOSUB Change.Color
-KEY(22) ON                      'Trap CTRL + C
-KEY 23, CHR$(&H4) + CHR$(&H26)
-ON KEY(23) GOSUB logon.command
-KEY(23) ON                      'Trap CTRL + L
-KEY 24, CHR$(&H4) + CHR$(&H24)
-ON KEY(24) GOSUB join.command
-KEY(24) ON                      'Trap CTRL + J
-KEY 25, CHR$(&H4) + CHR$(&H19)
-ON KEY(25) GOSUB punt.command
-KEY(25) ON                      'Trap CTRL + P
-RETURN
-
-'*********************
-keys.off:
-'*********************
-KEY(1) OFF
-KEY(2) OFF
-KEY(3) OFF
-KEY(17) OFF
-KEY(18) OFF
-KEY(19) OFF
-KEY(20) OFF
-KEY(21) OFF
-KEY(22) OFF
-KEY(23) OFF
-KEY(24) OFF
-KEY(25) OFF
-RETURN
-
-'*********************
-keys.on:
-'*********************
-KEY(1) ON
-KEY(2) ON
-KEY(3) ON
-KEY(17) ON
-KEY(18) ON
-KEY(19) ON
-KEY(20) ON
-KEY(21) ON
-KEY(22) ON
-
-IF online = 1 THEN
-ELSE
-KEY(23) ON
-END IF
-
-KEY(24) ON
-KEY(25) ON
 RETURN
 
 '*********************
@@ -230,7 +167,6 @@ RETURN
 help.screen:
 '*********************
 TIMER OFF
-GOSUB keys.off
 COLOR mycolor
 LOCATE 3, 6: PRINT CHR$(218); STRING$(68, 196); CHR$(191)
 FOR h = 4 TO 22
@@ -244,7 +180,7 @@ LOCATE 8, 10: PRINT "CTRL + N           Change your Alias while Connected"
 LOCATE 9, 10: PRINT "CTRL + A           Enter the Anti-Punt Password [ANTI]"
 LOCATE 10, 10: PRINT "CTRL + P           Punts an Unprotected User out of NWG"
 LOCATE 11, 10: PRINT "CTRL + C           Changes Network Graffiti User Color"
-LOCATE 12, 10: PRINT "CTRL + J           Joins a Channel [Default: #MAIN]"
+LOCATE 12, 10: PRINT "CTRL + G           Joins a Channel [Default: #MAIN]"
 LOCATE 13, 10: PRINT "CTRL + X           Exits Network Graffiti"
 LOCATE 14, 10: PRINT "CTRL + W           Lists Connected Users and Details"
 LOCATE 15, 10: PRINT "CTRL + H           Switches to [Anti-Hack Mode]"
@@ -255,9 +191,7 @@ COLOR 15
 LOCATE 21, 10: PRINT "        NWG - Copyright (C)1999-"; RIGHT$(DATE$, 4); " haxorjim"
 COLOR mycolor
 LOCATE 23, 6: PRINT CHR$(192); STRING$(68, 196); CHR$(217)
-DO WHILE INKEY$ = ""
-LOOP
-GOSUB keys.on
+DO: _LIMIT 60: k& = _KEYHIT: LOOP UNTIL k& > 0           ' Wait for new keypress (ignore releases)
 TIMER ON
 GOSUB draw.program
 IF online <> 1 THEN GOSUB welcome.message
@@ -299,7 +233,6 @@ RETURN
 '*********************
 logon.command:
 '*********************
-GOSUB keys.off
 COLOR mycolor
 LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
 LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
@@ -321,14 +254,12 @@ myclient$ = current2$
 ender2$ = ""
 test2$ = ""
 current2$ = ""
-GOSUB keys.on
 IF myclient$ <> "" AND myclient$ <> " " THEN
  online = 1
  mylevel$ = "VULNERABLE"
  GOSUB join.channel
  GOTO message.loop
 ELSE
- KEY(23) ON
  GOSUB draw.program
  GOSUB welcome.message
 END IF
@@ -338,7 +269,6 @@ RETURN
 rename.command:
 '*********************
 IF online = 1 THEN
- GOSUB keys.off
  TIMER OFF
  COLOR mycolor
  LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
@@ -362,7 +292,6 @@ IF online = 1 THEN
  test2$ = ""
  current2$ = ""
  TIMER ON
- GOSUB keys.on
  IF myclient2$ <> "" AND myclient2$ <> " " THEN
   myclient.old$ = myclient$
   write.rename.message = 1
@@ -417,16 +346,13 @@ RETURN
 type.command:
 '*********************
 TIMER OFF
-GOSUB keys.off
 COLOR 7
 CLS
 prmpt$ = "type " + filename$
 SHELL prmpt$
-DO WHILE INKEY$ = ""
-LOOP
+DO: _LIMIT 60: k& = _KEYHIT: LOOP UNTIL k& > 0           ' Wait for new keypress
 GOSUB draw.program
 IF online <> 1 THEN GOSUB welcome.message
-GOSUB keys.on
 TIMER ON
 RETURN
 
@@ -434,7 +360,6 @@ RETURN
 join.command:
 '*********************
 IF online = 1 THEN
-GOSUB keys.off
 TIMER OFF
 mychannel.old$ = mychannel$
 COLOR mycolor
@@ -459,7 +384,6 @@ ender2$ = ""
 test2$ = ""
 current2$ = ""
 TIMER ON
-GOSUB keys.on
 IF mychannel$ <> "" THEN
  write.join.message = 1
 ELSE
@@ -472,9 +396,7 @@ RETURN
 who.command:
 '*********************
 IF online = 1 THEN
- GOSUB keys.off
  write.who.messages = 1
- GOSUB keys.on
 END IF
 RETURN
 
@@ -482,7 +404,6 @@ RETURN
 punt.command:
 '*********************
 IF online = 1 THEN
-GOSUB keys.off
 TIMER OFF
 mychannel.old$ = mychannel$
 COLOR mycolor
@@ -507,11 +428,9 @@ ender2$ = ""
 test2$ = ""
 current2$ = ""
 TIMER ON
-GOSUB keys.on
- IF them$ <> "" THEN
-  write.punt.message = 1
- END IF
- GOSUB keys.on
+IF them$ <> "" THEN
+ write.punt.message = 1
+END IF
 END IF
 RETURN
 
@@ -520,7 +439,6 @@ anti.command:
 '*********************
 IF online = 1 THEN
  TIMER OFF
- GOSUB keys.off
  COLOR mycolor
  LOCATE 10, 15: PRINT CHR$(218); STRING$(44, 196); CHR$(191)
  LOCATE 11, 15: PRINT CHR$(179); SPACE$(29); CHR$(218); STRING$(12, 196); CHR$(191); SPACE$(1); CHR$(179)
@@ -535,53 +453,50 @@ IF online = 1 THEN
  LOCATE 12, 32: PRINT STRING$(10, 250)
  COLOR mycolor
  DO WHILE ender2$ <> "true"
- test2$ = INKEY$
-  IF test2$ = CHR$(13) THEN                               'IF ENTER KEY
-   ender2$ = "true"
-  ELSE                                                    'ELSE
-   IF test2$ = CHR$(8) THEN                              'IF B.S., DELETE
-    length = LEN(current2$)                             'find length
-    IF length > 0 THEN length = length - 1              'if greater 0 then -1
-    current2$ = LEFT$(current2$, length)                '-1 to current
-    pass$ = LEFT$(pass$, length)                        '  -1 to pass
+  k& = _KEYHIT
+  SELECT CASE k&
+   CASE 13                                                ' ENTER
+    ender2$ = "true"
+   CASE 8                                                 ' BACKSPACE
+    length = LEN(current2$)
+    IF length > 0 THEN length = length - 1
+    current2$ = LEFT$(current2$, length)
+    pass$ = LEFT$(pass$, length)
     COLOR mycolor
     LOCATE 12, 30: PRINT "[ " + SPACE$(10) + " ]"
     COLOR 8
     LOCATE 12, 32: PRINT STRING$(10, 250)
     COLOR mycolor
     LOCATE 12, 32: PRINT pass$
-   ELSE                                                  'ELSE
-    IF test2$ <> "" THEN                                'IF not nothing
-     IF LEN(current2$) = 10 THEN                        'IF not max length
-      BEEP
-     ELSE
-      current2$ = current2$ + test2$
-      pass$ = pass$ + "*"
-      LOCATE 12, 32: PRINT pass$
-     END IF
+   CASE 32 TO 126                                         ' Printable ASCII
+    IF LEN(current2$) = 10 THEN
+     BEEP
     ELSE
-     p1 = p1 + 2
-     IF p1 >= 10 THEN
-      p1 = 0
-      cool1$ = CHR$(177)
-      LOCATE 12, 47: PRINT SPACE$(10)
-     ELSE
-      cool1$ = cool1$ + CHR$(177) + CHR$(177)
-     END IF
-     COLOR 8
-     LOCATE 12, 47: PRINT cool1$
-     COLOR mycolor
+     current2$ = current2$ + CHR$(k&)
+     pass$ = pass$ + "*"
+     LOCATE 12, 32: PRINT pass$
     END IF
-   END IF
-  END IF
-LOOP
+   CASE 0                                                 ' No key pressed
+    p1 = p1 + 2
+    IF p1 >= 10 THEN
+     p1 = 0
+     cool1$ = CHR$(177)
+     LOCATE 12, 47: PRINT SPACE$(10)
+    ELSE
+     cool1$ = cool1$ + CHR$(177) + CHR$(177)
+    END IF
+    COLOR 8
+    LOCATE 12, 47: PRINT cool1$
+    COLOR mycolor
+    _LIMIT 60
+  END SELECT
+ LOOP
 code$ = current2$
 ender2$ = ""
 test2$ = ""
 current2$ = ""
 pass$ = ""
  COLOR mycolor
- GOSUB keys.on
  IF UCASE$(code$) = "IDDQD" THEN
   super.access = 1
   mylevel$ = "INVINCIBLE"
@@ -778,33 +693,57 @@ RETURN
 input.message:
 '*********************
 DO WHILE ender$ <> "true"                               ' if not end go
- test$ = INKEY$                                         ' put key into test$
-  IF test$ = CHR$(13) THEN                               'IF ENTER KEY
-    ender$ = "true"                                      ' end = true
-  ELSE                                                   'ELSE
-    IF test$ = CHR$(8) THEN                              ' IF B.S., DELETE
-      length = LEN(current$)                            '  find length
-      IF length > 0 THEN length = length - 1             '  if greater 0 then -1
-      current$ = LEFT$(current$, length)                 '  -1 to current
-      COLOR 8
-      LOCATE 21, 3: PRINT STRING$(62, 250)                    '  clear line
-      COLOR mycolor
-      LOCATE 21, 3: PRINT current$                     '  update hidden
-    ELSE                                                 ' ELSE
-      IF test$ <> "" THEN                                '  IF not nothing
-       IF LEN(current$) = 62 THEN
-        BEEP
-       ELSE
-        IF ASC(test$) >= 32 AND ASC(test$) < 127 AND test$ <> CHR$(34) THEN
-         current$ = current$ + test$                      '   update string
-         LOCATE 21, 3: PRINT current$                   '   redisplay w/ hidden
-        END IF
-       END IF
-      ELSE
-      END IF
-    END IF                                               ' END IF
-  END IF                                                 'END IF
+ k& = _KEYHIT
+ ctrlDown = _KEYDOWN(100305) OR _KEYDOWN(100306)        ' Left or Right CTRL
+ SELECT CASE k&
+  CASE 15104: GOSUB help.screen: GOTO input.msg.resume   ' F1
+  CASE 15360: GOSUB shell.command: GOTO input.msg.resume ' F2
+  CASE 15616: GOSUB type.command: GOTO input.msg.resume  ' F3
+  CASE 97, 65                                            ' A
+   IF ctrlDown THEN GOSUB anti.command: GOTO input.msg.resume ELSE GOTO type.char
+  CASE 110, 78                                           ' N
+   IF ctrlDown THEN GOSUB rename.command: GOTO input.msg.resume ELSE GOTO type.char
+  CASE 104, 72                                           ' H
+   IF ctrlDown THEN GOSUB hack.command: GOTO input.msg.resume ELSE GOTO type.char
+  CASE 120, 88                                           ' X
+   IF ctrlDown THEN GOSUB exit.chat ELSE GOTO type.char
+  CASE 119, 87                                           ' W
+   IF ctrlDown THEN GOSUB who.command: GOTO input.msg.resume ELSE GOTO type.char
+  CASE 99, 67                                            ' C
+   IF ctrlDown THEN GOSUB Change.Color: GOTO input.msg.resume ELSE GOTO type.char
+  CASE 103, 71                                           ' G (join/Go to channel)
+   IF ctrlDown THEN GOSUB join.command: GOTO input.msg.resume ELSE GOTO type.char
+  CASE 112, 80                                           ' P
+   IF ctrlDown THEN GOSUB punt.command: GOTO input.msg.resume ELSE GOTO type.char
+  CASE 8                                                 ' BACKSPACE
+   IF LEN(current$) > 0 THEN
+    current$ = LEFT$(current$, LEN(current$) - 1)
+    COLOR 8: LOCATE 21, 3: PRINT STRING$(62, 250)
+    COLOR mycolor: LOCATE 21, 3: PRINT current$
+   END IF
+  CASE 13                                                ' ENTER
+   ender$ = "true"
+  CASE 32 TO 126                                         ' Printable ASCII
+type.char:
+   IF ctrlDown = 0 THEN                                  ' Only if CTRL not held
+    IF k& <> 34 THEN                                     ' Not quote char
+     IF LEN(current$) < 62 THEN
+      current$ = current$ + CHR$(k&)
+      LOCATE 21, 3: PRINT current$
+     ELSE
+      BEEP
+     END IF
+    END IF
+   END IF
+  CASE 0                                                 ' No key pressed
+   _LIMIT 60
+ END SELECT
 LOOP                                                    'LOOP until enter
+GOTO input.msg.done
+input.msg.resume:
+ LOCATE 21, 3: PRINT current$                            ' Redisplay after handler
+ GOTO input.message
+input.msg.done:
 say$ = current$
 COLOR 8
 LOCATE 21, 3: PRINT STRING$(62, 250)
@@ -983,11 +922,12 @@ COLOR menu.line, 0
 GOSUB menu.lines
 COLOR 7, 0
 DO WHILE endloop$ <> "true"
- keypress$ = INKEY$
- IF keypress$ <> "" THEN
-  IF keypress$ = CHR$(13) THEN endloop$ = "true"
-  IF keypress$ = CHR$(9) THEN menu$ = "down": GOSUB menu2
- END IF
+ k& = _KEYHIT
+ SELECT CASE k&
+  CASE 13: endloop$ = "true"                              ' ENTER
+  CASE 9: menu$ = "down": GOSUB menu2                     ' TAB
+ END SELECT
+ _LIMIT 60
 LOOP
 endloop$ = ""
 kepress$ = ""
@@ -1086,45 +1026,43 @@ RETURN
 input.prompts:
 '****************
 DO WHILE ender2$ <> "true"
- test2$ = INKEY$
-  IF test2$ = CHR$(13) THEN                               'IF ENTER KEY
+ k& = _KEYHIT
+ SELECT CASE k&
+  CASE 13                                                ' ENTER
    ender2$ = "true"
-  ELSE                                                    'ELSE
-   IF test2$ = CHR$(8) THEN                              'IF B.S., DELETE
-    length = LEN(current2$)                             'find length
-    IF length > 0 THEN length = length - 1              'if greater 0 then -1
-    current2$ = LEFT$(current2$, length)                '-1 to current
+  CASE 8                                                 ' BACKSPACE
+   IF LEN(current2$) > 0 THEN
+    current2$ = LEFT$(current2$, LEN(current2$) - 1)
     COLOR mycolor
     LOCATE by, bx: PRINT "[ " + SPACE$(10) + " ]"
     COLOR 8
     LOCATE py, px: PRINT STRING$(10, 250)
     COLOR mycolor
     LOCATE py, px: PRINT current2$
-   ELSE                                                  'ELSE
-    IF test2$ <> "" THEN                                'IF not nothing
-     IF LEN(current2$) = 10 THEN                        'IF not max length
-      BEEP
-     ELSE
-      IF ASC(test2$) >= 32 AND ASC(test2$) < 127 AND test2$ <> CHR$(34) THEN
-       current2$ = current2$ + test2$
-       LOCATE py, px: PRINT current2$
-      END IF
-     END IF
+   END IF
+  CASE 32 TO 126                                         ' Printable ASCII
+   IF k& <> 34 THEN                                      ' Not quote char
+    IF LEN(current2$) < 10 THEN
+     current2$ = current2$ + CHR$(k&)
+     LOCATE py, px: PRINT current2$
     ELSE
-     p1 = p1 + 2
-     IF p1 >= 10 THEN
-      p1 = 0
-      cool1$ = CHR$(177)
-      LOCATE fy, fx: PRINT SPACE$(10)
-     ELSE
-      cool1$ = cool1$ + CHR$(177) + CHR$(177)
-     END IF
-     COLOR 8
-     LOCATE fy, fx: PRINT cool1$
-     COLOR mycolor
+     BEEP
     END IF
    END IF
-  END IF
+  CASE 0                                                 ' No key pressed
+   p1 = p1 + 2
+   IF p1 >= 10 THEN
+    p1 = 0
+    cool1$ = CHR$(177)
+    LOCATE fy, fx: PRINT SPACE$(10)
+   ELSE
+    cool1$ = cool1$ + CHR$(177) + CHR$(177)
+   END IF
+   COLOR 8
+   LOCATE fy, fx: PRINT cool1$
+   COLOR mycolor
+   _LIMIT 60
+ END SELECT
 LOOP
 RETURN
 
